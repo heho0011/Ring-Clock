@@ -1,3 +1,12 @@
+/**
+ * This file is a template for config.h, which the project depends on.
+ * 
+ * config.h is not committed to GitHub because it contains
+ * settings such as usernames and passwords.
+ * 
+ * Please make any necessary changes, and save it as config.h.
+ */
+
 #define WIFI_NETWORK    "Your WiFi Network"
 #define WIFI_PASSWORD   "Your WiFi Password"
 
