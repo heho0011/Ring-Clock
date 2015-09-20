@@ -1,0 +1,7 @@
+#define WIFI_NETWORK    "Your WiFi Network"
+#define WIFI_PASSWORD   "Your WiFi Password"
+
+#define TIME_SERVER     "pool.ntp.org"
+#define SYNC_INTERVAL   14400 // number of seconds between time requests
+
+#define TIMEZONE_SERVICE_USERNAME   "Your GeoNames Username"
