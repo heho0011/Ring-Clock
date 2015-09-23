@@ -5,27 +5,41 @@
 
 #include <ESP8266WiFi.h>
 #include <Time.h>
+#include <Adafruit_NeoPixel.h>
 #include "Geolocation.h"
 #include "InternetTime.h"
 #include "config.h"
+
+#define NEOPIXELS_PIN        6
+#define NEOPIXELS_NUM       60
+
+Adafruit_NeoPixel pixels(NEOPIXELS_NUM, NEOPIXELS_PIN, NEO_GRB | NEO_KHZ800);
 
 InternetTime * timeSource;
 
 void setup() {
 
-    Serial.begin(9600);
+    Serial.begin(115200);
+
+    // Serial.println("Starting NeoPixels...");
+    // pixels.begin();
+
 
     printMacAddress();
 
-    // Try to connect to WiFi until it succeeds
-    while (WiFi.begin(WIFI_NETWORK, WIFI_PASSWORD) != WL_CONNECTED) {
+    Serial.print("Connecting to ");
+    Serial.println(WIFI_NETWORK);
 
-        Serial.print("Could not connect to \"");
-        Serial.print(WIFI_NETWORK);
-        Serial.println("\". Retrying in 10 seconds...");
-        delay(10000);
+    WiFi.begin(WIFI_NETWORK, WIFI_PASSWORD);
+
+    // Try to connect to WiFi until it succeeds
+    while (WiFi.status() != WL_CONNECTED) {
+        // Spin here until it connects
+        delay(500);
+        Serial.print(".");
     }
 
+    Serial.println("");
     Serial.println("Connected");
 
     printWiFiInfo();
@@ -63,10 +77,10 @@ void printMacAddress() {
 
     Serial.print("MAC address: ");
 
-    unsigned char mac[6];
+    unsigned char mac[WL_MAC_ADDR_LENGTH];
     WiFi.macAddress(mac);
 
-    for (int i = 5; i > 0; i--) {
+    for (int i = WL_MAC_ADDR_LENGTH - 1; i > 0; i--) {
         Serial.print(mac[i], HEX);
         Serial.print(":");
     }
