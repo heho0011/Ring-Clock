@@ -28,13 +28,14 @@ bool Geolocation::locate() {
 bool Geolocation::getCurrentPosition() {
 
     if (!httpGet(LOCATION_SERVICE_HOST, "/loc")) {
-        return true;
+        return false;
     }
 
     // Wait for response to arrive
     while (!wifi.available()) { }
 
     // Parse the response
+    wifi.find("\r\n\r\n");
     String message = wifi.readStringUntil(',');
     latitude = message.toFloat();
 
@@ -46,7 +47,7 @@ bool Geolocation::getCurrentPosition() {
     Serial.print(", ");
     Serial.println(longitude);
 
-    return false;
+    return true;
 }
 
 bool Geolocation::getCurrentTimezone() {
@@ -87,7 +88,6 @@ bool Geolocation::httpGet(const String hostname, const String url) {
     }
 
     String message = "GET " + url + " HTTP/1.1\r\n";
-    message += " HTTP/1.1\r\n";
     message += "Host: " + hostname + "\r\n";
     message += "Connection: close\r\n";
     message += "\r\n";

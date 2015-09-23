@@ -20,6 +20,7 @@ InternetTime * timeSource;
 void setup() {
 
     Serial.begin(115200);
+    Serial.print("\n\n");
 
     // Serial.println("Starting NeoPixels...");
     // pixels.begin();
@@ -57,8 +58,15 @@ void setup() {
 
 void loop() {
 
+    // For now, simply print the time once per second
     delay(1000);
-    Serial.print(".");
+    time_t t = now();
+    String message = String(hour(t));
+    message += ":";
+    message += String(minute(t));
+    message += ":";
+    message += String(second(t));
+    Serial.println(message);
 }
 
 /**

@@ -46,7 +46,7 @@ time_t InternetTime::getTime() {
     // Perform a DNS lookup on the hostname
     IPAddress ip;
     int dnsError = WiFi.hostByName(hostname, ip);
-    if (dnsError) {
+    if (dnsError != 1) {
         Serial.print("Could not resolve hostname. Error: ");
         Serial.println(dnsError);
         return 0;
@@ -86,7 +86,6 @@ void InternetTime::sendRequest(ntp_packet_t & packet, IPAddress ip) {
     packet.precision = -14;
     packet.ref_id = ip;
     packet.ref_ts = lastSyncTime;
-    packet.origin_ts.ts_seconds = now() + UNIX_TIME_OFFSET;
 
     udp.beginPacket(ip, NTP_OUT_PORT);
     udp.write((char*)&packet, sizeof(ntp_packet_t));
@@ -95,9 +94,13 @@ void InternetTime::sendRequest(ntp_packet_t & packet, IPAddress ip) {
 
 time_t InternetTime::parseResponse(ntp_packet_t & packet) {
 
+    // First, we need to convert from big-endian to little-endian
+    // (equivalent of ntohl(3), which is not available for Arduino)
+    time_t networkTime = __builtin_bswap32(packet.recv_ts.ts_seconds);
+
     // Convert the wire time, which uses an epoch of 1900,
     // to Unix time, which uses an epoch of 1970.
-    time_t unixTime = packet.recv_ts.ts_seconds - UNIX_TIME_OFFSET;
+    time_t unixTime = networkTime - UNIX_TIME_OFFSET;
 
     // Convert from UTC to localized time
     time_t timezoneOffset = Geolocation::getTimezoneOffset();
