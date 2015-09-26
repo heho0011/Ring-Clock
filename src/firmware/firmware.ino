@@ -10,10 +10,12 @@
 #include "InternetTime.h"
 #include "config.h"
 
-#define NEOPIXELS_PIN        6
+#define NEOPIXELS_PIN       2
 #define NEOPIXELS_NUM       60
+#define RED                 0xff0000
+#define BLUE                0x0000ff
 
-Adafruit_NeoPixel pixels(NEOPIXELS_NUM, NEOPIXELS_PIN, NEO_GRB | NEO_KHZ800);
+Adafruit_NeoPixel pixels(NEOPIXELS_NUM, NEOPIXELS_PIN, NEO_GRB + NEO_KHZ800);
 
 InternetTime * timeSource;
 
@@ -21,10 +23,6 @@ void setup() {
 
     Serial.begin(115200);
     Serial.print("\n\n");
-
-    // Serial.println("Starting NeoPixels...");
-    // pixels.begin();
-
 
     printMacAddress();
 
@@ -35,7 +33,6 @@ void setup() {
 
     // Try to connect to WiFi until it succeeds
     while (WiFi.status() != WL_CONNECTED) {
-        // Spin here until it connects
         delay(500);
         Serial.print(".");
     }
@@ -53,20 +50,70 @@ void setup() {
     setSyncInterval(SYNC_INTERVAL);
     setSyncProvider(&getInternetTime);
 
+    Serial.println("Starting NeoPixels...");
+    pixels.begin();
+
     Serial.println("Ready");
 }
 
 void loop() {
 
-    // For now, simply print the time once per second
-    delay(1000);
+    static int lastSecond = 0;
+
+    // Send the time over serial when the second changes
     time_t t = now();
-    String message = String(hour(t));
-    message += ":";
-    message += String(minute(t));
-    message += ":";
-    message += String(second(t));
-    Serial.println(message);
+    if (lastSecond != second(t)) {
+
+        lastSecond = second(t);
+
+        String message = String(hour(t));
+        message += ":";
+        message += String(minute(t));
+        message += ":";
+        message += String(second(t));
+        Serial.println(message);
+    }
+
+    displayTime();
+}
+
+/**
+ * Shows the current time on the LED strip.
+ */
+void displayTime() {
+
+    static int lastMinute = 0;
+    static int lastHour = 0;
+
+    time_t t = now();
+    int currentMinute = minute(t);
+    int currentHour = hourFormat12(t);
+
+    // Only update the strip when the time changes
+    if (lastMinute != currentMinute && lastHour != currentHour) {
+
+        int hourPixel = currentHour * 5 + currentMinute / 12;
+        
+        for (int i = 0; i < NEOPIXELS_NUM; i++) {
+
+            uint32_t color = 0x000000;
+
+            if (i < currentMinute) {
+                color |= RED;
+            }
+
+            if (i == hourPixel) {
+                color |= BLUE;
+            }
+
+            pixels.setPixelColor(i, color);
+        }
+
+        pixels.show();
+
+        lastMinute = currentMinute;
+        lastHour = currentHour;
+    }
 }
 
 /**
