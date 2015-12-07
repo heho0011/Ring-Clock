@@ -5,17 +5,10 @@
 
 #include <ESP8266WiFi.h>
 #include <Time.h>
-#include <Adafruit_NeoPixel.h>
+#include "config.h"
 #include "Geolocation.h"
 #include "InternetTime.h"
-#include "config.h"
-
-#define NEOPIXELS_PIN       2
-#define NEOPIXELS_NUM       60
-#define RED                 0xff0000
-#define BLUE                0x0000ff
-
-Adafruit_NeoPixel pixels(NEOPIXELS_NUM, NEOPIXELS_PIN, NEO_GRB + NEO_KHZ800);
+#include "ClockDisplay.h"
 
 InternetTime * timeSource;
 
@@ -51,7 +44,7 @@ void setup() {
     setSyncProvider(&getInternetTime);
 
     Serial.println("Starting NeoPixels...");
-    pixels.begin();
+    ClockDisplay::init();
 
     Serial.println("Ready");
 }
@@ -74,46 +67,7 @@ void loop() {
         Serial.println(message);
     }
 
-    displayTime();
-}
-
-/**
- * Shows the current time on the LED strip.
- */
-void displayTime() {
-
-    static int lastMinute = 0;
-    static int lastHour = 0;
-
-    time_t t = now();
-    int currentMinute = minute(t);
-    int currentHour = hourFormat12(t);
-
-    // Only update the strip when the time changes
-    if (lastMinute != currentMinute && lastHour != currentHour) {
-
-        int hourPixel = currentHour * 5 + currentMinute / 12;
-        
-        for (int i = 0; i < NEOPIXELS_NUM; i++) {
-
-            uint32_t color = 0x000000;
-
-            if (i < currentMinute) {
-                color |= RED;
-            }
-
-            if (i == hourPixel) {
-                color |= BLUE;
-            }
-
-            pixels.setPixelColor(i, color);
-        }
-
-        pixels.show();
-
-        lastMinute = currentMinute;
-        lastHour = currentHour;
-    }
+    ClockDisplay::displayTime(t);
 }
 
 /**

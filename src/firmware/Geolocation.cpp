@@ -9,7 +9,7 @@ WiFiClient Geolocation::wifi;
 
 #define LOCATION_SERVICE_HOST       "ipinfo.io"
 
-#define TIMEZONE_SERVICE_HOST       "api.geonames.org"
+#define TIMEZONE_SERVICE_HOST       "api.timezonedb.com"
 
 
 bool Geolocation::locate() {
@@ -18,9 +18,9 @@ bool Geolocation::locate() {
         return false;
     }
 
-    if (!getCurrentTimezone()) {
-        return false;
-    }
+    // if (!getCurrentTimezone()) {
+    //     return false;
+    // }
 
     return true;
 }
@@ -52,10 +52,10 @@ bool Geolocation::getCurrentPosition() {
 
 bool Geolocation::getCurrentTimezone() {
 
-    String url = "/timezoneJSON";
-    url += "?lat=" + String(latitude);
+    String url = "/?format=json";
+    url += "&lat=" + String(latitude);
     url += "&lng=" + String(longitude);
-    url += "&username=" + String(TIMEZONE_SERVICE_USERNAME);
+    url += "&key=" + String(TIMEZONE_SERVICE_KEY);
 
     if (!httpGet(TIMEZONE_SERVICE_HOST, url)) {
         return false;
@@ -65,17 +65,16 @@ bool Geolocation::getCurrentTimezone() {
     while (!wifi.available()) { }
 
     // Read the response
-    if (!wifi.find("\"rawOffset\":")) {
+    if (!wifi.find("\"gmtOffset\":\"")) {
         Serial.println("Could not parse timezone");
     }
 
-    String message = wifi.readStringUntil(',');
+    String message = wifi.readStringUntil('\"');
 
-    float rawOffset = message.toFloat();
-    timezoneOffset = rawOffset * 60 * 60;
+    timezoneOffset = message.toFloat();
 
     Serial.print("Detected timezone: ");
-    Serial.println(rawOffset);
+    Serial.println(timezoneOffset/3600);
 
     return true;
 }
@@ -98,6 +97,12 @@ bool Geolocation::httpGet(const String hostname, const String url) {
 }
 
 int Geolocation::getTimezoneOffset() {
+
+    // Update timezone every request so that DST is handled
+    if (!Geolocation::getCurrentTimezone()) {
+        return 0;
+    }
+
     return timezoneOffset;
 }
 
