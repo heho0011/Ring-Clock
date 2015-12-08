@@ -23,14 +23,14 @@ void ClockDisplay::init() {
  */
 void ClockDisplay::displayTime(time_t t) {
 
-    static int lastMinute = 0;
-    static int lastHour = 0;
+    static int lastSecond = 0;
 
+    int currentSecond = second(t);
     int currentMinute = minute(t);
     int currentHour = hourFormat12(t);
 
     // Only update the strip when the time changes
-    if (lastMinute != currentMinute || lastHour != currentHour) {
+    if (lastSecond != currentSecond) {
 
         int hourPixel = currentHour * 5 + currentMinute / 12;
         
@@ -38,8 +38,12 @@ void ClockDisplay::displayTime(time_t t) {
 
             uint32_t color = 0x000000;
 
-            if (i < currentMinute) {
+            if (i == currentSecond) {
                 color |= RED;
+            }
+
+            if (i < currentMinute) {
+                color |= GREEN;
             }
 
             if (i == hourPixel) {
@@ -51,7 +55,6 @@ void ClockDisplay::displayTime(time_t t) {
 
         pixels.show();
 
-        lastMinute = currentMinute;
-        lastHour = currentHour;
+        lastSecond = currentSecond;
     }
 }
