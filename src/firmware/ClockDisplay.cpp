@@ -27,12 +27,12 @@ void ClockDisplay::displayTime(time_t t) {
 
     int currentSecond = second(t);
     int currentMinute = minute(t);
-    int currentHour = hourFormat12(t);
+    int currentHour = hour(t);
 
     // Only update the strip when the time changes
     if (lastSecond != currentSecond) {
 
-        int hourPixel = currentHour * 5 + currentMinute / 12;
+        int hourPixel = (currentHour % 12) * 5 + currentMinute / 12;
         
         for (int i = 0; i < NEOPIXELS_NUM; i++) {
 
