@@ -6,6 +6,7 @@
 #define UDP_IN_PORT         2390
 #define NTP_OUT_PORT        123
 #define UNIX_TIME_OFFSET    2208988800L
+#define TIMEOUT             2000 //ms
 
 // Leap indicator warning bits
 enum {
@@ -58,11 +59,19 @@ time_t InternetTime::getTime() {
 
     Serial.println("Sending NTP request...");
     sendRequest(packet, ip);
-
+    long lastRequestTime = millis();
+    int numberOfTransmits = 1;
 
     // Wait for a response
     Serial.println("Waiting for response...");
-    while (!udp.parsePacket()) { }
+    while (!udp.parsePacket()) {
+        if (millis() > lastRequestTime + TIMEOUT * numberOfTransmits) {
+            Serial.println("Timed out. Retrying...");
+            sendRequest(packet, ip);
+            lastRequestTime = millis();
+            numberOfTransmits++;
+        }
+    }
 
     udp.read((char*)&packet, sizeof(ntp_packet_t));
     
