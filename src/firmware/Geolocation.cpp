@@ -10,20 +10,35 @@
 
 void GeolocationClass::begin() {
 
-    locate();
+    getCurrentPosition();
 }
 
-bool GeolocationClass::locate() {
+int GeolocationClass::getTimezoneOffset() {
 
-    if (!getCurrentPosition()) {
-        return false;
+    // Update timezone every request so that DST is handled
+    if (!getCurrentTimezone()) {
+        return 0;
     }
 
-    // if (!getCurrentTimezone()) {
-    //     return false;
-    // }
+    return timezoneOffset;
+}
 
-    return true;
+float GeolocationClass::getLatitude() {
+
+    if (!hasBeenLocated) {
+        getCurrentPosition();
+    }
+
+    return latitude;
+}
+
+float GeolocationClass::getLongitude() {
+
+    if (!hasBeenLocated) {
+        getCurrentPosition();
+    }
+
+    return longitude;
 }
 
 bool GeolocationClass::getCurrentPosition() {
@@ -48,14 +63,20 @@ bool GeolocationClass::getCurrentPosition() {
     Serial.print(", ");
     Serial.println(longitude);
 
+    hasBeenLocated = true;
+
     return true;
 }
 
 bool GeolocationClass::getCurrentTimezone() {
 
+    if (!hasBeenLocated) {
+        getCurrentPosition();
+    }
+
     String url = "/?format=json";
-    url += "&lat=" + String(latitude);
-    url += "&lng=" + String(longitude);
+    url += "&lat=" + String(getLatitude());
+    url += "&lng=" + String(getLongitude());
     url += "&key=" + String(TIMEZONE_SERVICE_KEY);
 
     if (!httpGet(TIMEZONE_SERVICE_HOST, url)) {
@@ -95,24 +116,6 @@ bool GeolocationClass::httpGet(const String hostname, const String url) {
     wifi.print(message);
 
     return true;
-}
-
-int GeolocationClass::getTimezoneOffset() {
-
-    // Update timezone every request so that DST is handled
-    if (!getCurrentTimezone()) {
-        return 0;
-    }
-
-    return timezoneOffset;
-}
-
-float GeolocationClass::getLatitude() {
-    return latitude;
-}
-
-float GeolocationClass::getLongitude() {
-    return longitude;
 }
 
 GeolocationClass Geolocation;

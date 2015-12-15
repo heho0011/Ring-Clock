@@ -15,13 +15,6 @@ public:
     void begin();
 
     /**
-     * Locates the user.
-     *
-     * @return     whether the user was located successfully
-     */
-    bool locate();
-
-    /**
      * Gets the most recently determined latitude.
      *
      * @return     the latitude
@@ -48,6 +41,7 @@ private:
     bool getCurrentTimezone();
     bool httpGet(const String hostname, const String url);
 
+    bool hasBeenLocated = false;
     int timezoneOffset;
     float latitude, longitude;
     WiFiClient wifi;
