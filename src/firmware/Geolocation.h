@@ -5,45 +5,52 @@
 /**
  * A class to get the current position and time zone.
  */
-class Geolocation {
+class GeolocationClass {
 
 public:
 
     /**
-     * Determines the approximate current position.
+     * Locates the user.
+     */
+    void begin();
+
+    /**
+     * Locates the user.
      *
      * @return     whether the user was located successfully
      */
-    static bool locate();
+    bool locate();
 
     /**
      * Gets the most recently determined latitude.
      *
      * @return     the latitude
      */
-    static float getLatitude();
+    float getLatitude();
 
     /**
      * Gets the most recently determined longitude.
      *
      * @return     the latitude
      */
-    static float getLongitude();
+    float getLongitude();
 
     /**
      * Gets the timezone offset for the most recently determined location.
      *
      * @return     the number of seconds offset from UTC, or 0 if failed
      */
-    static int getTimezoneOffset();
+    int getTimezoneOffset();
 
 private:
 
-    static bool getCurrentPosition();
-    static bool getCurrentTimezone();
-    static bool httpGet(const String hostname, const String url);
+    bool getCurrentPosition();
+    bool getCurrentTimezone();
+    bool httpGet(const String hostname, const String url);
 
-    static int timezoneOffset;
-    static float latitude, longitude;
-    static WiFiClient wifi;
+    int timezoneOffset;
+    float latitude, longitude;
+    WiFiClient wifi;
 };
+
+extern GeolocationClass Geolocation;

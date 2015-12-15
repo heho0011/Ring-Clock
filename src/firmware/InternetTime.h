@@ -6,16 +6,22 @@
 /**
  * A class to retrieve the current time from the internet.
  */
-class InternetTime {
+class InternetTimeClass {
 
 public:
 
     /**
      * Constructs a new internet time source (NTP).
+     */
+    InternetTimeClass();
+
+    /**
+     * Begins checking the time.
      * 
      * @param[in]  timeServer  The hostname of the time server to use
+     * @param[in]  interval  The number of seconds between sync intervals
      */
-    InternetTime(const char* timeServer);
+    void begin(const char* timeServer, time_t interval);
 
     /**
      * Gets the time from the server.
@@ -56,3 +62,5 @@ private:
     WiFiUDP udp;
     timestamp_t lastSyncTime;
 };
+
+extern InternetTimeClass InternetTime;

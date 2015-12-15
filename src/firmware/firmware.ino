@@ -10,8 +10,6 @@
 #include "InternetTime.h"
 #include "ClockDisplay.h"
 
-InternetTime * timeSource;
-
 void setup() {
 
     Serial.begin(115200);
@@ -35,48 +33,22 @@ void setup() {
 
     printWiFiInfo();
 
-    Serial.println("Locating...");
-    Geolocation::locate();
+    Serial.println("Initializing geolocation...");
+    Geolocation.begin();
 
-    Serial.println("Setting time sync provider...");
-    timeSource = new InternetTime(TIME_SERVER);
-    setSyncInterval(SYNC_INTERVAL);
-    setSyncProvider(&getInternetTime);
+    Serial.println("Initializing internet time...");
+    InternetTime.begin(TIME_SERVER, SYNC_INTERVAL);
 
-    Serial.println("Starting NeoPixels...");
-    ClockDisplay::init();
+    Serial.println("Initializing NeoPixels...");
+    ClockDisplay.begin();
 
     Serial.println("Ready");
 }
 
 void loop() {
 
-    static int lastSecond = 0;
-
-    // Send the time over serial when the second changes
     time_t t = now();
-    if (lastSecond != second(t)) {
-
-        lastSecond = second(t);
-
-        String message = String(hour(t));
-        message += ":";
-        message += String(minute(t));
-        message += ":";
-        message += String(second(t));
-        Serial.println(message);
-    }
-
-    ClockDisplay::displayTime(t);
-}
-
-/**
- * Wraps the InternetTime read function.
- *
- * @return     the time from the internet time source
- */
-time_t getInternetTime() {
-    return timeSource->getTime();
+    ClockDisplay.displayTime(t);
 }
 
 /**

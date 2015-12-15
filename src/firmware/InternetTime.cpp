@@ -27,16 +27,28 @@ enum {
     NTP_MODE_RESERVED_CONTROL,
 } NTP_MODE;
 
-InternetTime::InternetTime(const char* timeServer) {
+InternetTimeClass::InternetTimeClass() {
+
+    memset(&lastSyncTime, 0, sizeof(timestamp_t));
+}
+
+time_t getTimeWrapper() {
+    return InternetTime.getTime();
+}
+
+void InternetTimeClass::begin(const char* timeServer, time_t interval) {
 
     hostname = timeServer;
-    memset(&lastSyncTime, 0, sizeof(timestamp_t));
 
     // Start listening on the incoming UDP port
     udp.begin(UDP_IN_PORT);
+
+    // Set up time library
+    setSyncInterval(interval);
+    setSyncProvider(&getTimeWrapper);
 }
 
-time_t InternetTime::getTime() {
+time_t InternetTimeClass::getTime() {
 
     static ntp_packet_t packet;
 
@@ -83,7 +95,7 @@ time_t InternetTime::getTime() {
     return currentTime;
 }
 
-void InternetTime::sendRequest(ntp_packet_t & packet, IPAddress ip) {
+void InternetTimeClass::sendRequest(ntp_packet_t & packet, IPAddress ip) {
 
     memset(&packet, 0, sizeof(ntp_packet_t));
 
@@ -101,7 +113,7 @@ void InternetTime::sendRequest(ntp_packet_t & packet, IPAddress ip) {
     udp.endPacket();
 }
 
-time_t InternetTime::parseResponse(ntp_packet_t & packet) {
+time_t InternetTimeClass::parseResponse(ntp_packet_t & packet) {
 
     // First, we need to convert from big-endian to little-endian
     // (equivalent of ntohl(3), which is not available for Arduino)
@@ -112,8 +124,10 @@ time_t InternetTime::parseResponse(ntp_packet_t & packet) {
     time_t unixTime = networkTime - UNIX_TIME_OFFSET;
 
     // Convert from UTC to localized time
-    time_t timezoneOffset = Geolocation::getTimezoneOffset();
+    time_t timezoneOffset = Geolocation.getTimezoneOffset();
     time_t localizedTime = unixTime + timezoneOffset;
 
     return localizedTime;
 }
+
+InternetTimeClass InternetTime;

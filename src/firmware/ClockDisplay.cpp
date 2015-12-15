@@ -7,21 +7,17 @@
 #define GREEN               0x00ff00
 #define BLUE                0x0000ff
 
-Adafruit_NeoPixel ClockDisplay::pixels(NEOPIXELS_NUM,
-                                       NEOPIXELS_PIN,
-                                       NEO_GRB + NEO_KHZ800);
+#define DEBUG               1
 
-/**
- * Sets up the NeoPixel strip.
- */
-void ClockDisplay::init() {
+ClockDisplayClass::ClockDisplayClass(int numPixels, int pin, int settings)
+    : pixels(numPixels, pin, settings) { }
+
+void ClockDisplayClass::begin() {
+
     pixels.begin();
 }
 
-/**
- * Shows the given time on the NeoPixel strip.
- */
-void ClockDisplay::displayTime(time_t t) {
+void ClockDisplayClass::displayTime(time_t t) {
 
     static int lastSecond = 0;
 
@@ -31,6 +27,15 @@ void ClockDisplay::displayTime(time_t t) {
 
     // Only update the strip when the time changes
     if (lastSecond != currentSecond) {
+
+#ifdef DEBUG
+        String message = String(currentHour);
+        message += ":";
+        message += String(currentMinute);
+        message += ":";
+        message += String(currentSecond);
+        Serial.println(message);
+#endif
 
         int hourPixel = (currentHour % 12) * 5 + currentMinute / 12;
         
@@ -42,7 +47,7 @@ void ClockDisplay::displayTime(time_t t) {
                 color |= RED;
             }
 
-            if (i < currentMinute) {
+            if (i == currentMinute) {
                 color |= GREEN;
             }
 
@@ -58,3 +63,5 @@ void ClockDisplay::displayTime(time_t t) {
         lastSecond = currentSecond;
     }
 }
+
+ClockDisplayClass ClockDisplay(NEOPIXELS_NUM, NEOPIXELS_PIN, NEO_GRB + NEO_KHZ800);

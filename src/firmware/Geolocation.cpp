@@ -1,10 +1,6 @@
 #include "Geolocation.h"
 #include "config.h"
 
-int Geolocation::timezoneOffset;
-float Geolocation::latitude, Geolocation::longitude;
-WiFiClient Geolocation::wifi;
-
 #define HTTP_PORT                   80
 
 #define LOCATION_SERVICE_HOST       "ipinfo.io"
@@ -12,7 +8,12 @@ WiFiClient Geolocation::wifi;
 #define TIMEZONE_SERVICE_HOST       "api.timezonedb.com"
 
 
-bool Geolocation::locate() {
+void GeolocationClass::begin() {
+
+    locate();
+}
+
+bool GeolocationClass::locate() {
 
     if (!getCurrentPosition()) {
         return false;
@@ -25,7 +26,7 @@ bool Geolocation::locate() {
     return true;
 }
 
-bool Geolocation::getCurrentPosition() {
+bool GeolocationClass::getCurrentPosition() {
 
     if (!httpGet(LOCATION_SERVICE_HOST, "/loc")) {
         return false;
@@ -50,7 +51,7 @@ bool Geolocation::getCurrentPosition() {
     return true;
 }
 
-bool Geolocation::getCurrentTimezone() {
+bool GeolocationClass::getCurrentTimezone() {
 
     String url = "/?format=json";
     url += "&lat=" + String(latitude);
@@ -79,7 +80,7 @@ bool Geolocation::getCurrentTimezone() {
     return true;
 }
 
-bool Geolocation::httpGet(const String hostname, const String url) {
+bool GeolocationClass::httpGet(const String hostname, const String url) {
 
     if (!wifi.connect(hostname.c_str(), HTTP_PORT)) {
         Serial.println("Error: Could not connect to " + hostname);
@@ -96,20 +97,22 @@ bool Geolocation::httpGet(const String hostname, const String url) {
     return true;
 }
 
-int Geolocation::getTimezoneOffset() {
+int GeolocationClass::getTimezoneOffset() {
 
     // Update timezone every request so that DST is handled
-    if (!Geolocation::getCurrentTimezone()) {
+    if (!getCurrentTimezone()) {
         return 0;
     }
 
     return timezoneOffset;
 }
 
-float Geolocation::getLatitude() {
+float GeolocationClass::getLatitude() {
     return latitude;
 }
 
-float Geolocation::getLongitude() {
+float GeolocationClass::getLongitude() {
     return longitude;
 }
+
+GeolocationClass Geolocation;
