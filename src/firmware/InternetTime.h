@@ -26,7 +26,7 @@ public:
     /**
      * Gets the time from the server.
      *
-     * @return     the number of seconds since 1970, in UTC
+     * @return     the number of seconds since 1970, in local time
      */
     time_t getTime();
 
