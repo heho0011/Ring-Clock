@@ -17,6 +17,11 @@ void ClockDisplayClass::begin() {
     pixels.begin();
 }
 
+void ClockDisplayClass::update() {
+
+    displayTime(now());
+}
+
 void ClockDisplayClass::displayTime(time_t t) {
 
     static int lastSecond = 0;

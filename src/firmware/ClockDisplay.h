@@ -25,6 +25,13 @@ public:
     void begin();
 
     /**
+     * Updates the clock face with the current time.
+     * 
+     * @note Run frequently inside loop()
+     */
+    void update();
+
+    /**
      * Displays the time on the clock face.
      * 
      * @param   t   The time to display

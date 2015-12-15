@@ -47,8 +47,7 @@ void setup() {
 
 void loop() {
 
-    time_t t = now();
-    ClockDisplay.displayTime(t);
+    ClockDisplay.update();
 }
 
 /**
