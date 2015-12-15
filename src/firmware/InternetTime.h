@@ -56,7 +56,7 @@ private:
     } ntp_packet_t;
 
     void sendRequest(ntp_packet_t & buffer, IPAddress ip);
-    time_t parseResponse(ntp_packet_t & buffer);
+    time_t parseResponse(ntp_packet_t & buffer, time_t networkDelay);
 
     const char* hostname;
     WiFiUDP udp;

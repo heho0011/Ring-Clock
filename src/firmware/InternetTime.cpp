@@ -73,21 +73,32 @@ time_t InternetTimeClass::getTime() {
     sendRequest(packet, ip);
     long lastRequestTime = millis();
     int numberOfTransmits = 1;
+    int delay = 0;
 
     // Wait for a response
     Serial.println("Waiting for response...");
     while (!udp.parsePacket()) {
-        if (millis() > lastRequestTime + TIMEOUT * numberOfTransmits) {
+
+        delay = millis() - lastRequestTime;
+
+        if (delay > TIMEOUT * numberOfTransmits) {
             Serial.println("Timed out. Retrying...");
             sendRequest(packet, ip);
             lastRequestTime = millis();
+            delay = 0;
             numberOfTransmits++;
         }
     }
 
     udp.read((char*)&packet, sizeof(ntp_packet_t));
     
-    time_t currentTime = parseResponse(packet);
+    // Assume network delay is half the round trip time, in seconds
+    time_t networkDelay = (time_t) round(delay/2/1000.0);
+
+    Serial.print("Network delay: ");
+    Serial.print(delay);
+    Serial.println("ms");
+    time_t currentTime = parseResponse(packet, networkDelay);
 
     Serial.print("The current local time is: ");
     Serial.println(currentTime);
@@ -113,11 +124,11 @@ void InternetTimeClass::sendRequest(ntp_packet_t & packet, IPAddress ip) {
     udp.endPacket();
 }
 
-time_t InternetTimeClass::parseResponse(ntp_packet_t & packet) {
+time_t InternetTimeClass::parseResponse(ntp_packet_t & packet, time_t networkDelay) {
 
     // First, we need to convert from big-endian to little-endian
     // (equivalent of ntohl(3), which is not available for Arduino)
-    time_t networkTime = __builtin_bswap32(packet.recv_ts.ts_seconds);
+    time_t networkTime = __builtin_bswap32(packet.recv_ts.ts_seconds) + networkDelay;
 
     // Convert the wire time, which uses an epoch of 1900,
     // to Unix time, which uses an epoch of 1970.
