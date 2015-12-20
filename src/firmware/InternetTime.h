@@ -40,27 +40,31 @@ private:
 
     // See RFC 1305 for details on the transmit packet structure.
     typedef struct ntp_packet {
-        unsigned int leap_indicator: 2;
-        unsigned int version_number: 3;
-        unsigned int mode: 3;
-        uint8_t  stratum;
-        uint8_t  poll;
-        uint8_t  precision;
-        uint32_t root_delay;
-        uint32_t root_dispersion;
-        uint32_t  ref_id;
-        timestamp_t ref_ts;
-        timestamp_t origin_ts;
-        timestamp_t recv_ts;
-        timestamp_t trans_ts;
+        // These bits are swapped due to endianness conversion
+        unsigned    mode:    3;
+        unsigned    version: 3;
+        unsigned    leap:    2;
+        uint8_t     stratum;
+        int8_t      poll;
+        int8_t      precision;
+        uint32_t    root_delay;
+        uint32_t    root_dispersion;
+        uint32_t    ref_id;
+        uint64_t    ref_ts;
+        uint64_t    origin_ts;
+        uint64_t    recv_ts;
+        uint64_t    trans_ts;
     } ntp_packet_t;
 
-    void sendRequest(ntp_packet_t & buffer, IPAddress ip);
-    time_t parseResponse(ntp_packet_t & buffer, time_t networkDelay);
+    void sendRequest(IPAddress ip);
+    time_t parseResponse(ntp_packet_t & packet, uint64_t clientTransmitTime, uint64_t clientReceiveTime);
+    int8_t calculatePrecision();
+    uint64_t getNtpTimestamp();
 
     const char* hostname;
     WiFiUDP udp;
-    timestamp_t lastSyncTime;
+    uint64_t lastSyncTime;
+    int8_t precision;
 };
 
 extern InternetTimeClass InternetTime;

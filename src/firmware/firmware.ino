@@ -33,13 +33,8 @@ void setup() {
 
     printWiFiInfo();
 
-    Serial.println("Initializing geolocation...");
     Geolocation.begin();
-
-    Serial.println("Initializing internet time...");
     InternetTime.begin(TIME_SERVER, SYNC_INTERVAL);
-
-    Serial.println("Initializing NeoPixels...");
     ClockDisplay.begin();
 
     Serial.println("Ready");
