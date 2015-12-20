@@ -2,6 +2,8 @@
 #include "config.h"
 
 #define HTTP_PORT                   80
+#define TIMEOUT                     2000 // ms
+#define MAX_CONNECTION_ATTEMPTS     3
 
 #define LOCATION_SERVICE_HOST       "ipinfo.io"
 
@@ -71,7 +73,9 @@ bool GeolocationClass::getCurrentPosition() {
 bool GeolocationClass::getCurrentTimezone() {
 
     if (!hasBeenLocated) {
-        getCurrentPosition();
+        if (!getCurrentPosition()) {
+            return false;
+        }
     }
 
     String url = "/?format=json";
@@ -103,9 +107,24 @@ bool GeolocationClass::getCurrentTimezone() {
 
 bool GeolocationClass::httpGet(const String hostname, const String url) {
 
-    if (!wifi.connect(hostname.c_str(), HTTP_PORT)) {
-        Serial.println("Error: Could not connect to " + hostname);
-        return false;
+    long lastRequestTime = millis();
+    int numberOfTimeouts = 0;
+
+    // Wait for a response
+    while (!wifi.connect(hostname.c_str(), HTTP_PORT)) {
+
+        if (millis() - lastRequestTime > (TIMEOUT << numberOfTimeouts)) {
+            Serial.println("Connection to '" + hostname + "' timed out.");
+            lastRequestTime = millis();
+            numberOfTimeouts++;
+        }
+
+        if (numberOfTimeouts >= MAX_CONNECTION_ATTEMPTS) {
+            Serial.println("Error: Could not connect to '" + hostname + "'");
+            return false;
+        }
+
+        yield(); // Reset the watchdog
     }
 
     String message = "GET " + url + " HTTP/1.1\r\n";

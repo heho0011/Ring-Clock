@@ -122,22 +122,21 @@ time_t InternetTimeClass::getTime() {
     uint64_t clientTransmitTime = getNtpTimestamp();
 
     long lastRequestTime = millis();
-    int numberOfTransmits = 1;
-    int delay = 0;
+    int numberOfTimeouts = 0;
 
     // Wait for a response
     while (!udp.parsePacket()) {
 
-        delay = millis() - lastRequestTime;
+        if (millis() - lastRequestTime > (TIMEOUT << numberOfTimeouts)) {
 
-        if (delay > TIMEOUT * numberOfTransmits) {
-            Serial.println("NTP request timed out. Retrying...");
+            Serial.println("NTP request timed out.");
             sendRequest(ip);
             clientTransmitTime = getNtpTimestamp();
             lastRequestTime = millis();
-            delay = 0;
-            numberOfTransmits++;
+            numberOfTimeouts++;
         }
+
+        yield(); // Reset the watchdog
     }
     
     ntp_packet_t response;
