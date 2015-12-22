@@ -4,7 +4,11 @@
  */
 
 #include <ESP8266WiFi.h>
+#include <DNSServer.h>
+#include <ESP8266WebServer.h>
 #include <Time.h>
+#include <Adafruit_NeoPixel.h>
+
 #include "config.h"
 #include "Geolocation.h"
 #include "InternetTime.h"

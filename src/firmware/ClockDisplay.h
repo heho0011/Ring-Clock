@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Time.h>
-#include "Adafruit_NeoPixel.h"
+#include <Adafruit_NeoPixel.h>
 
 /**
  * A class to retrieve the current time from the internet.
