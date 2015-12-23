@@ -6,6 +6,7 @@
 #include <ESP8266WiFi.h>
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
+#include <WiFiManager.h>
 #include <Time.h>
 #include <Adafruit_NeoPixel.h>
 
@@ -21,16 +22,8 @@ void setup() {
 
     printMacAddress();
 
-    Serial.print("Connecting to ");
-    Serial.println(WIFI_NETWORK);
-
-    WiFi.begin(WIFI_NETWORK, WIFI_PASSWORD);
-
-    // Try to connect to WiFi until it succeeds
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
-    }
+    WiFiManager wifiManager;
+    wifiManager.autoConnect("Clock Setup");
 
     Serial.println("");
     Serial.println("Connected");
