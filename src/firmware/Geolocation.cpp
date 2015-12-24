@@ -9,10 +9,13 @@
 #define LOCATION_SERVICE_HOST       "ipinfo.io"
 #define TIMEZONE_SERVICE_HOST       "api.timezonedb.com"
 
-void onTimezoneUpdate(Key key, String & value) {
+extern String timezones[];
 
-    time_t currentTime = InternetTime.getTime();
-    setTime(currentTime);
+void onTimezoneUpdate(Key key, int value) {
+
+    Serial.println("Timezone updated!");
+    // time_t currentTime = InternetTime.getTime();
+    // setTime(currentTime);
 }
 
 void GeolocationClass::begin() {
@@ -89,7 +92,8 @@ bool GeolocationClass::updateTimezone() {
 
     String url = "/?format=json";
 
-    bool autoDetectTimezone = Settings[SELECTED_TIMEZONE].equals("auto");
+    int selectedTimezone = Settings.get(SELECTED_TIMEZONE);
+    bool autoDetectTimezone = (selectedTimezone == 0);
 
     if (autoDetectTimezone) {
 
@@ -103,7 +107,7 @@ bool GeolocationClass::updateTimezone() {
         url += "&lng=" + String(getLongitude());
 
     } else {
-        url += "&zone=" + Settings[SELECTED_TIMEZONE];
+        url += "&zone=" + timezones[selectedTimezone];
     }
 
 

@@ -5,6 +5,7 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
+#include <vector>
 
 /**
  * Represents the various possible settings keys.
@@ -41,10 +42,10 @@ public:
     /**
      * Function signature for an observer function.
      */
-    typedef void (*ObserverFunction)(Key, String &);
+    typedef void (*ObserverFunction)(Key, int);
 
     /**
-     * Registers a function to be called when the given setting is updated.
+     * Registers a function to be called when the given key's value is updated.
      *
      * @param      key       The setting to observe
      * @param[in]  observer  The function to be called. See above.
@@ -52,31 +53,21 @@ public:
     void registerObserver(Key key, ObserverFunction observer);
 
     /**
-     * Gets a setting.
+     * Unregisters all instances of an observer from a key.
      *
-     * @param[in]  key    The key to get
-     *
-     * @return     A const reference to the key's value
+     * @param      key       The setting being observed
+     * @param[in]  observer  The function to unregister.
      */
-    const String & operator[](Key key) const;
+    void unregisterObserver(Key key, ObserverFunction observer);
 
     /**
      * Gets a setting.
      *
      * @param[in]  key    The key to get
      *
-     * @return     A const reference to the key's value
+     * @return     The key's value
      */
-    const String & get(Key key) const;
-
-    /**
-     * Sets a setting.
-     *
-     * @param[in]  key   The key to set
-     *
-     * @return     A reference to the key's value
-     */
-    String & operator[](Key key);
+    int get(Key key);
 
     /**
      * Sets a setting.
@@ -84,18 +75,19 @@ public:
      * @param[in]  key   The key to set
      * @param[in]  key   The value to change it to
      */
-    void set(Key key, String & value);
+    void set(Key key, int value);
 
 private:
 
+    void initializeEEPROM();
     String generateSettingsPage();
-    void save();
+    bool save();
 
     MDNSResponder mdns;
     ESP8266WebServer server;
 
-    String store[NUM_KEYS];
-    ObserverFunction observers[NUM_KEYS];
+    int store[NUM_KEYS];
+    std::vector<ObserverFunction> observers[NUM_KEYS];
 };
 
 extern SettingsClass Settings;

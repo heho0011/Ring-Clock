@@ -1,6 +1,8 @@
 #pragma once
 
-String[] timezones = [
+#define NUM_TIMEZONES           418
+String timezones[NUM_TIMEZONES] = {
+    "Auto-detect",
     "Africa/Abidjan",
     "Africa/Accra",
     "Africa/Addis_Ababa",
@@ -418,4 +420,4 @@ String[] timezones = [
     "Pacific/Tongatapu",
     "Pacific/Wake",
     "Pacific/Wallis",
-];
+};

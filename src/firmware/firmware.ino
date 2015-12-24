@@ -10,6 +10,7 @@
 #include <WiFiManager.h>
 #include <Time.h>
 #include <Adafruit_NeoPixel.h>
+#include <EEPROM.h>
 
 #include "config.h"
 #include "Settings.h"
@@ -32,10 +33,10 @@ void setup() {
 
     printWiFiInfo();
 
+    Settings.begin();
     Geolocation.begin();
     InternetTime.begin(TIME_SERVER, SYNC_INTERVAL);
     ClockDisplay.begin();
-    Settings.begin();
 
     Serial.println("Ready");
 }
