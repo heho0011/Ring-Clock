@@ -14,8 +14,8 @@ extern String timezones[];
 void onTimezoneUpdate(Key key, int value) {
 
     Serial.println("Timezone updated!");
-    // time_t currentTime = InternetTime.getTime();
-    // setTime(currentTime);
+    time_t currentTime = InternetTime.getTime();
+    setTime(currentTime);
 }
 
 void GeolocationClass::begin() {
