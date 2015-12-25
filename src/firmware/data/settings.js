@@ -18,16 +18,19 @@ $.ajax("/getSettings").done(function(settings) {
             .removeClass("alert-info")
             .addClass("alert-success")
             .text("Settings saved successfully!");
+
     } else if (location.search.indexOf("status=error") != -1) {
 
         $("#alert")
             .removeClass("alert-info")
             .addClass("alert-danger")
             .text("An error occurred when saving the settings.");
+
     } else {
 
         $("#alert")
             .removeClass("alert-info")
             .text("");
+            
     }
 });
