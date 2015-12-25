@@ -10,8 +10,7 @@
 #define MAGIC_NUMBER        0x42
 
 SettingsClass::SettingsClass()
-    : server(80) {
-    }
+    : server(80) { }
 
 void SettingsClass::begin() {
 
@@ -112,7 +111,8 @@ String SettingsClass::generateSettingsPage() {
     int selectedTimezone = get(SELECTED_TIMEZONE);
 
     // FIXME: crash keeps occurring due to this loop when
-    // requesting / from a browser. Might be running out of heap space.
+    // requesting / from a browser. Might be running out of heap or stack space.
+    // Crash actually occurs a few seconds after the server.send returns.
     /* Error message:
 
         Exception (28):
@@ -148,7 +148,7 @@ String SettingsClass::generateSettingsPage() {
     */
 
     String options = "";
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 40; i++) {
         options.concat("<option value='");
         options.concat(i);
         options.concat("'");
