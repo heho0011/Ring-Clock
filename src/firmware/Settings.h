@@ -80,7 +80,7 @@ public:
 private:
 
     void initializeEEPROM();
-    String generateSettingsPage();
+    String buildJSON();
     bool save();
 
     MDNSResponder mdns;
