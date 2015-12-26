@@ -10,6 +10,6 @@
 #define TIME_SERVER     "pool.ntp.org"
 #define SYNC_INTERVAL   14400 // number of seconds between time requests
 
-// A GeoNames account is necessary to determine the timezone.
-// You will need to create a free account at http://www.geonames.org/
+// A TimeZoneDB account is necessary to determine the timezone.
+// You will need to create a free account at http://www.timezonedb.com/
 #define TIMEZONE_SERVICE_KEY   "Your TimeZoneDB API Key"
