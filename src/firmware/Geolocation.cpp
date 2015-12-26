@@ -20,7 +20,7 @@ void onTimezoneUpdate(Key key, int value) {
 
 void GeolocationClass::begin() {
 
-    Settings.registerObserver(SELECTED_TIMEZONE, &onTimezoneUpdate);
+    Settings.registerObserver(SET_TIMEZONE, &onTimezoneUpdate);
     updatePosition();
 }
 
@@ -92,7 +92,7 @@ bool GeolocationClass::updateTimezone() {
 
     String url = "/?format=json";
 
-    int selectedTimezone = Settings.get(SELECTED_TIMEZONE);
+    int selectedTimezone = Settings.get(SET_TIMEZONE);
     bool autoDetectTimezone = (selectedTimezone == 0);
 
     if (autoDetectTimezone) {

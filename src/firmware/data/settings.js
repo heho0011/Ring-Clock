@@ -1,17 +1,27 @@
-// Display loading message when form is submitted
-$("#save-button").click(function() {
+function showLoadingMessage() {
+
     $("#alert")
         .removeClass("alert-info alert-danger")
         .addClass("alert-info")
         .text("Loading...");
-})
+}
 
-// Get the settings from the server
+$(function() {
+    showLoadingMessage();
+    $("form *").prop("disabled", true);
+});
+
+$("#save-button").click(showLoadingMessage);
+
 $.ajax("/getSettings").done(function(settings) {
 
     // Display the settings on the page
     $("#tz > option[value=" + settings.timezone + "]").prop("selected", true);
+    $("#brightness").val(settings.brightness);
 
+    $("form *").prop("disabled", false);
+
+    // Display the relevant alert if necessary
     if (location.search.indexOf("status=success") != -1) {
 
         $("#alert")
@@ -31,6 +41,6 @@ $.ajax("/getSettings").done(function(settings) {
         $("#alert")
             .removeClass("alert-info")
             .text("");
-            
+
     }
 });

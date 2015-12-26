@@ -11,8 +11,9 @@
  * Represents the various possible settings keys.
  */
 enum Key {
-    SELECTED_TIMEZONE,
-    NUM_KEYS
+    SET_TIMEZONE,
+    SET_BRIGHTNESS,
+    SET_NUM_KEYS
 };
 
 /**
@@ -86,8 +87,8 @@ private:
     MDNSResponder mdns;
     ESP8266WebServer server;
 
-    int store[NUM_KEYS];
-    std::vector<ObserverFunction> observers[NUM_KEYS];
+    int store[SET_NUM_KEYS];
+    std::vector<ObserverFunction> observers[SET_NUM_KEYS];
 };
 
 extern SettingsClass Settings;

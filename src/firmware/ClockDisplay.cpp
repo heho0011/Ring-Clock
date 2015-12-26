@@ -1,4 +1,5 @@
 #include "ClockDisplay.h"
+#include "Settings.h"
 
 #define NEOPIXELS_PIN       2
 #define NEOPIXELS_NUM       60
@@ -9,12 +10,21 @@
 
 #define DEBUG               1
 
+void onBrightnessUpdate(Key key, int value) {
+
+    Serial.println("Brightness updated!");
+    ClockDisplay.setBrightness(value);
+}
+
 ClockDisplayClass::ClockDisplayClass(int numPixels, int pin, int settings)
     : pixels(numPixels, pin, settings) { }
 
 void ClockDisplayClass::begin() {
 
     pixels.begin();
+
+    setBrightness(Settings.get(SET_BRIGHTNESS));
+    Settings.registerObserver(SET_BRIGHTNESS, &onBrightnessUpdate);
 }
 
 void ClockDisplayClass::update() {
@@ -67,6 +77,18 @@ void ClockDisplayClass::displayTime(time_t t) {
 
         lastSecond = currentSecond;
     }
+}
+
+void ClockDisplayClass::setBrightness(int brightness) {
+
+    // Make sure input is valid
+    if (brightness < 0 || brightness > 100) {
+        return;
+    }
+
+    // Scale the brightness 
+    uint8_t scaledBrightness = brightness * 255 / 100;
+    pixels.setBrightness(scaledBrightness);
 }
 
 ClockDisplayClass ClockDisplay(NEOPIXELS_NUM, NEOPIXELS_PIN, NEO_GRB + NEO_KHZ800);

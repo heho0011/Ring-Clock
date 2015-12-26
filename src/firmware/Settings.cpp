@@ -107,7 +107,8 @@ String SettingsClass::buildJSON() {
 
     String json = "{";
     
-    json.concat("\"timezone\":" + String(get(SELECTED_TIMEZONE)));
+    json.concat("\"timezone\":" + String(get(SET_TIMEZONE)));
+    json.concat(",\"brightness\":" + String(get(SET_BRIGHTNESS)));
 
     json.concat("}");
     return json;
@@ -115,13 +116,27 @@ String SettingsClass::buildJSON() {
 
 bool SettingsClass::save() {
 
+    bool isSuccess = true;
+
     if (server.hasArg("tz")) {
 
         int tz = server.arg("tz").toInt();
-        set(SELECTED_TIMEZONE, tz);
+        set(SET_TIMEZONE, tz);
     }
 
-    return true;
+    if (server.hasArg("brightness")) {
+
+        int brightness = server.arg("brightness").toInt();
+
+        // Make sure input is between 1 and 100
+        if (brightness >= 0 && brightness <= 100) {
+            set(SET_BRIGHTNESS, brightness);
+        } else {
+            isSuccess = false;
+        }
+    }
+
+    return isSuccess;
 }
 
 SettingsClass Settings;
