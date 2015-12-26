@@ -4,10 +4,6 @@
 #define NEOPIXELS_PIN       2
 #define NEOPIXELS_NUM       60
 
-#define RED                 0xff0000
-#define GREEN               0x00ff00
-#define BLUE                0x0000ff
-
 #define DEBUG               1
 
 void onBrightnessUpdate(Key key, int value) {
@@ -59,15 +55,15 @@ void ClockDisplayClass::displayTime(time_t t) {
             uint32_t color = 0x000000;
 
             if (i == currentSecond) {
-                color |= RED;
+                color |= Settings.get(SET_SECOND_COLOR);
             }
 
             if (i == currentMinute) {
-                color |= GREEN;
+                color |= Settings.get(SET_MINUTE_COLOR);
             }
 
             if (i == hourPixel) {
-                color |= BLUE;
+                color |= Settings.get(SET_HOUR_COLOR);
             }
 
             pixels.setPixelColor(i, color);

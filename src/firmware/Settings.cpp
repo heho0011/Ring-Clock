@@ -9,6 +9,10 @@
 #define MAGIC_ADDRESS       511
 #define MAGIC_NUMBER        0x42
 
+#define RED                 0xff0000
+#define GREEN               0x00ff00
+#define BLUE                0x0000ff
+
 SettingsClass::SettingsClass()
     : server(80) { }
 
@@ -16,6 +20,9 @@ void SettingsClass::begin() {
 
     // Initialize the store to default values
     memset(&store, 0, sizeof(store));
+    store[SET_HOUR_COLOR] = BLUE;
+    store[SET_MINUTE_COLOR] = GREEN;
+    store[SET_SECOND_COLOR] = RED;
     initializeEEPROM();
 
     mdns.begin(SETTINGS_DOMAIN, WiFi.localIP());
@@ -109,6 +116,9 @@ String SettingsClass::buildJSON() {
     
     json.concat("\"timezone\":" + String(get(SET_TIMEZONE)));
     json.concat(",\"brightness\":" + String(get(SET_BRIGHTNESS)));
+    json.concat(",\"hour_color\":" + String(get(SET_HOUR_COLOR)));
+    json.concat(",\"minute_color\":" + String(get(SET_MINUTE_COLOR)));
+    json.concat(",\"second_color\":" + String(get(SET_SECOND_COLOR)));
 
     json.concat("}");
     return json;
@@ -131,6 +141,45 @@ bool SettingsClass::save() {
         // Make sure input is between 1 and 100
         if (brightness >= 0 && brightness <= 100) {
             set(SET_BRIGHTNESS, brightness);
+        } else {
+            isSuccess = false;
+        }
+    }
+
+    if (server.hasArg("hour_color")) {
+
+        String colorCode = server.arg("hour_color");
+
+        // Convert the hex string to an int. Offset to remove the preceding #
+        int color = (int)strtol( &colorCode[1], NULL, 16);
+        if (color <= 0xffffff && color >= 0x000000) {
+            set(SET_HOUR_COLOR, color);
+        } else {
+            isSuccess = false;
+        }
+    }
+
+    if (server.hasArg("minute_color")) {
+
+        String colorCode = server.arg("minute_color");
+
+        // Convert the hex string to an int. Offset to remove the preceding #
+        int color = (int)strtol( &colorCode[1], NULL, 16);
+        if (color <= 0xffffff && color >= 0x000000) {
+            set(SET_MINUTE_COLOR, color);
+        } else {
+            isSuccess = false;
+        }
+    }
+
+    if (server.hasArg("second_color")) {
+
+        String colorCode = server.arg("second_color");
+
+        // Convert the hex string to an int. Offset to remove the preceding #
+        int color = (int)strtol( &colorCode[1], NULL, 16);
+        if (color <= 0xffffff && color >= 0x000000) {
+            set(SET_SECOND_COLOR, color);
         } else {
             isSuccess = false;
         }
