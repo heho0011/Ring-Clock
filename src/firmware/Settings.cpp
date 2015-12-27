@@ -99,14 +99,18 @@ int SettingsClass::get(Key key) {
 
 void SettingsClass::set(Key key, int value) {
 
-    store[key] = value;
-    
-    EEPROM.put(key * sizeof(int), value);
-    EEPROM.commit();
+    // Ignore unchanged values
+    if (value != store[key]) {
 
-    // Notify the observers
-    for (auto& it : observers[key]) {
-        (it)(key, value);
+        store[key] = value;
+        
+        EEPROM.put(key * sizeof(int), value);
+        EEPROM.commit();
+
+        // Notify the observers
+        for (auto& it : observers[key]) {
+            (it)(key, value);
+        }
     }
 }
 
