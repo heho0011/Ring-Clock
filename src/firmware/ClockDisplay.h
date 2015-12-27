@@ -47,6 +47,8 @@ public:
 
 private:
 
+    uint32_t perceived(uint32_t color);
+
     Adafruit_NeoPixel pixels;
 };
 

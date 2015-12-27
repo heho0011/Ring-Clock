@@ -6,6 +6,10 @@
 
 #define DEBUG               1
 
+#define EXTRACT_RED(c)      ((c & 0xff0000) >> 16)
+#define EXTRACT_GREEN(c)    ((c & 0x00ff00) >> 8)
+#define EXTRACT_BLUE(c)     (c & 0x0000ff)
+
 void onBrightnessUpdate(Key key, int value) {
 
     Serial.println("Brightness updated!");
@@ -66,7 +70,7 @@ void ClockDisplayClass::displayTime(time_t t) {
                 color |= Settings.get(SET_HOUR_COLOR);
             }
 
-            pixels.setPixelColor(i, color);
+            pixels.setPixelColor(i, perceived(color));
         }
 
         pixels.show();
@@ -85,6 +89,15 @@ void ClockDisplayClass::setBrightness(int brightness) {
     // Scale the brightness 
     uint8_t scaledBrightness = brightness * 255 / 100;
     pixels.setBrightness(scaledBrightness);
+}
+
+uint32_t ClockDisplayClass::perceived(uint32_t color) {
+
+   uint8_t red = sqrt(EXTRACT_RED(color));
+   uint8_t green = sqrt(EXTRACT_GREEN(color));
+   uint8_t blue = sqrt(EXTRACT_BLUE(color));
+
+   return pixels.Color(red, green, blue);
 }
 
 ClockDisplayClass ClockDisplay(NEOPIXELS_NUM, NEOPIXELS_PIN, NEO_GRB + NEO_KHZ800);
