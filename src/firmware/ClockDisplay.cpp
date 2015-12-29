@@ -10,7 +10,7 @@
 #define EXTRACT_GREEN(c)    ((c & 0x00ff00) >> 8)
 #define EXTRACT_BLUE(c)     (c & 0x0000ff)
 
-#define GAMMA               2.2
+#define GAMMA               2.8
 
 void onBrightnessUpdate(Key key, int value) {
 
@@ -95,7 +95,7 @@ void ClockDisplayClass::setBrightness(int brightness) {
 
 uint8_t ClockDisplayClass::gamma(uint8_t x) {
 
-    return (uint8_t)(255 * pow(x / 255.0, 1 / GAMMA));
+    return (uint8_t)(0.5 + 255.0 * pow(x / 255.0, GAMMA));
 }
 
 uint32_t ClockDisplayClass::perceived(uint32_t color) {
