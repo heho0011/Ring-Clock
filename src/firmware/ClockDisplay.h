@@ -47,6 +47,7 @@ public:
 
 private:
 
+    uint8_t gamma(uint8_t x);
     uint32_t perceived(uint32_t color);
 
     Adafruit_NeoPixel pixels;

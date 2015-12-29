@@ -10,6 +10,8 @@
 #define EXTRACT_GREEN(c)    ((c & 0x00ff00) >> 8)
 #define EXTRACT_BLUE(c)     (c & 0x0000ff)
 
+#define GAMMA               2.2
+
 void onBrightnessUpdate(Key key, int value) {
 
     Serial.println("Brightness updated!");
@@ -91,13 +93,18 @@ void ClockDisplayClass::setBrightness(int brightness) {
     pixels.setBrightness(scaledBrightness);
 }
 
+uint8_t ClockDisplayClass::gamma(uint8_t x) {
+
+    return (uint8_t)(255 * pow(x / 255.0, 1 / GAMMA));
+}
+
 uint32_t ClockDisplayClass::perceived(uint32_t color) {
 
-   uint8_t red = sqrt(EXTRACT_RED(color));
-   uint8_t green = sqrt(EXTRACT_GREEN(color));
-   uint8_t blue = sqrt(EXTRACT_BLUE(color));
+    uint8_t red = gamma(EXTRACT_RED(color));
+    uint8_t green = gamma(EXTRACT_GREEN(color));
+    uint8_t blue = gamma(EXTRACT_BLUE(color));
 
-   return pixels.Color(red, green, blue);
+    return pixels.Color(red, green, blue);
 }
 
 ClockDisplayClass ClockDisplay(NEOPIXELS_NUM, NEOPIXELS_PIN, NEO_GRB + NEO_KHZ800);
