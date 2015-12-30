@@ -6,11 +6,14 @@
 #include <ESP8266WiFi.h>
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
+#include <ESP8266mDNS.h>
 #include <WiFiManager.h>
 #include <Time.h>
 #include <Adafruit_NeoPixel.h>
+#include <EEPROM.h>
 
 #include "config.h"
+#include "Settings.h"
 #include "Geolocation.h"
 #include "InternetTime.h"
 #include "ClockDisplay.h"
@@ -30,6 +33,7 @@ void setup() {
 
     printWiFiInfo();
 
+    Settings.begin();
     Geolocation.begin();
     InternetTime.begin(TIME_SERVER, SYNC_INTERVAL);
     ClockDisplay.begin();
@@ -40,6 +44,7 @@ void setup() {
 void loop() {
 
     ClockDisplay.update();
+    Settings.handleClients();
 }
 
 /**

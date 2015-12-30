@@ -29,6 +29,13 @@ public:
     float getLongitude();
 
     /**
+     * Gets the detected timezone code.
+     *
+     * @return     the timezone
+     */
+    String getDetectedTimezone();
+
+    /**
      * Gets the timezone offset for the most recently determined location.
      *
      * @return     the number of seconds offset from UTC, or 0 if failed
@@ -37,14 +44,16 @@ public:
 
 private:
 
-    bool getCurrentPosition();
-    bool getCurrentTimezone();
+    bool updatePosition();
+    bool updateTimezone();
     bool httpGet(const String hostname, const String url);
+
+    WiFiClient wifi;
 
     bool hasBeenLocated = false;
     int timezoneOffset;
     float latitude, longitude;
-    WiFiClient wifi;
+    String detectedTimezone;
 };
 
 extern GeolocationClass Geolocation;

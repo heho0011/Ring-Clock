@@ -38,7 +38,17 @@ public:
      */
     void displayTime(time_t t);
 
+    /**
+     * Sets the brightness of the pixels.
+     *
+     * @param[in]  brightness  The new brightness value between 1 and 100
+     */
+    void setBrightness(int brightness);
+
 private:
+
+    uint8_t gamma(uint8_t x);
+    uint32_t perceived(uint32_t color);
 
     Adafruit_NeoPixel pixels;
 };

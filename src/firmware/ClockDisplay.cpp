@@ -1,13 +1,22 @@
 #include "ClockDisplay.h"
+#include "Settings.h"
 
 #define NEOPIXELS_PIN       2
 #define NEOPIXELS_NUM       60
 
-#define RED                 0xff0000
-#define GREEN               0x00ff00
-#define BLUE                0x0000ff
-
 #define DEBUG               1
+
+#define EXTRACT_RED(c)      ((c & 0xff0000) >> 16)
+#define EXTRACT_GREEN(c)    ((c & 0x00ff00) >> 8)
+#define EXTRACT_BLUE(c)     (c & 0x0000ff)
+
+#define GAMMA               2.8
+
+void onBrightnessUpdate(Key key, int value) {
+
+    Serial.println("Brightness updated!");
+    ClockDisplay.setBrightness(value);
+}
 
 ClockDisplayClass::ClockDisplayClass(int numPixels, int pin, int settings)
     : pixels(numPixels, pin, settings) { }
@@ -15,6 +24,9 @@ ClockDisplayClass::ClockDisplayClass(int numPixels, int pin, int settings)
 void ClockDisplayClass::begin() {
 
     pixels.begin();
+
+    setBrightness(Settings.get(SET_BRIGHTNESS));
+    Settings.registerObserver(SET_BRIGHTNESS, &onBrightnessUpdate);
 }
 
 void ClockDisplayClass::update() {
@@ -49,24 +61,51 @@ void ClockDisplayClass::displayTime(time_t t) {
             uint32_t color = 0x000000;
 
             if (i == currentSecond) {
-                color |= RED;
+                color |= Settings.get(SET_SECOND_COLOR);
             }
 
             if (i == currentMinute) {
-                color |= GREEN;
+                color |= Settings.get(SET_MINUTE_COLOR);
             }
 
             if (i == hourPixel) {
-                color |= BLUE;
+                color |= Settings.get(SET_HOUR_COLOR);
             }
 
-            pixels.setPixelColor(i, color);
+            pixels.setPixelColor(i, perceived(color));
         }
 
         pixels.show();
 
         lastSecond = currentSecond;
     }
+}
+
+void ClockDisplayClass::setBrightness(int brightness) {
+
+    // Make sure input is valid
+    if (brightness < 0 || brightness > 100) {
+        return;
+    }
+
+    // Scale the brightness 
+    uint8_t scaledBrightness = brightness * 255 / 100;
+    pixels.setBrightness(gamma(scaledBrightness));
+}
+
+uint8_t ClockDisplayClass::gamma(uint8_t x) {
+
+    // See https://learn.adafruit.com/led-tricks-gamma-correction/the-issue
+    return (uint8_t)(0.5 + 255.0 * pow(x / 255.0, GAMMA));
+}
+
+uint32_t ClockDisplayClass::perceived(uint32_t color) {
+
+    uint8_t red = gamma(EXTRACT_RED(color));
+    uint8_t green = gamma(EXTRACT_GREEN(color));
+    uint8_t blue = gamma(EXTRACT_BLUE(color));
+
+    return pixels.Color(red, green, blue);
 }
 
 ClockDisplayClass ClockDisplay(NEOPIXELS_NUM, NEOPIXELS_PIN, NEO_GRB + NEO_KHZ800);

@@ -205,7 +205,6 @@ time_t InternetTimeClass::parseResponse(ntp_packet_t & packet,
     // Convert the wire time, which uses an epoch of 1900,
     // to Unix time, which uses an epoch of 1970.
     currentTime = currentTime + timeElapsed + timeLeftInSecond;
-    Serial.println(fixedToFloat(currentTime));
     time_t unixTime = extractSeconds(currentTime) - UNIX_TIME_OFFSET;
 
     return unixTime;
