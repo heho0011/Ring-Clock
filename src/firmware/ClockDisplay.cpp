@@ -90,11 +90,12 @@ void ClockDisplayClass::setBrightness(int brightness) {
 
     // Scale the brightness 
     uint8_t scaledBrightness = brightness * 255 / 100;
-    pixels.setBrightness(scaledBrightness);
+    pixels.setBrightness(gamma(scaledBrightness));
 }
 
 uint8_t ClockDisplayClass::gamma(uint8_t x) {
 
+    // See https://learn.adafruit.com/led-tricks-gamma-correction/the-issue
     return (uint8_t)(0.5 + 255.0 * pow(x / 255.0, GAMMA));
 }
 
