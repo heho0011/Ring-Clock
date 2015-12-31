@@ -32,14 +32,14 @@ public:
     SettingsClass();
 
     /**
-     * Initializes the web server.
+     * Initializes the store and web server.
      */
     void begin();
 
     /**
      * Handles incoming connections.
      * 
-     * Call this inside loop()
+     * @note     Call this inside loop()
      */
     void handleClients();
 

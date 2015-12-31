@@ -18,11 +18,6 @@ SettingsClass::SettingsClass()
 
 void SettingsClass::begin() {
 
-    // Initialize the store to default values
-    memset(&store, 0, sizeof(store));
-    store[SET_HOUR_COLOR] = BLUE;
-    store[SET_MINUTE_COLOR] = GREEN;
-    store[SET_SECOND_COLOR] = RED;
     initializeEEPROM();
 
     mdns.begin(SETTINGS_DOMAIN, WiFi.localIP());
@@ -53,6 +48,12 @@ void SettingsClass::begin() {
 }
 
 void SettingsClass::initializeEEPROM() {
+
+    // Initialize the store to default values
+    memset(&store, 0, sizeof(store));
+    store[SET_HOUR_COLOR] = BLUE;
+    store[SET_MINUTE_COLOR] = GREEN;
+    store[SET_SECOND_COLOR] = RED;
 
     EEPROM.begin(512);
     
