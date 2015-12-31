@@ -6,9 +6,9 @@
 
 #define DEBUG               1
 
-#define EXTRACT_RED(c)      ((c & 0xff0000) >> 16)
-#define EXTRACT_GREEN(c)    ((c & 0x00ff00) >> 8)
-#define EXTRACT_BLUE(c)     (c & 0x0000ff)
+#define EXTRACT_RED(c)      (((c) & 0xff0000) >> 16)
+#define EXTRACT_GREEN(c)    (((c) & 0x00ff00) >> 8)
+#define EXTRACT_BLUE(c)     ((c) & 0x0000ff)
 
 #define GAMMA               2.8
 
