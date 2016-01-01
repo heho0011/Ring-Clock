@@ -16,6 +16,8 @@ enum Key {
     SET_HOUR_COLOR,
     SET_MINUTE_COLOR,
     SET_SECOND_COLOR,
+    SET_LAST_TIMEZONE_OFFSET, // TODO: this is not a setting. Make a DataStore class.
+
     SET_NUM_KEYS
 };
 

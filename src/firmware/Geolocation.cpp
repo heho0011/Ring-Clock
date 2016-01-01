@@ -28,7 +28,11 @@ int GeolocationClass::getTimezoneOffset() {
 
     // Update timezone every request so that DST is handled
     if (!updateTimezone()) {
-        return 0;
+
+        timezoneOffset = Settings.get(SET_LAST_TIMEZONE_OFFSET);
+
+        Serial.print("Using previously detected timezone: ");
+        Serial.println(timezoneOffset/3600);
     }
 
     return timezoneOffset;
@@ -136,6 +140,8 @@ bool GeolocationClass::updateTimezone() {
     } else {
         timezoneOffset = wifi.readStringUntil('\"').toFloat();
     }
+    
+    Settings.set(SET_LAST_TIMEZONE_OFFSET, timezoneOffset);
 
     Serial.print("Detected timezone: ");
     Serial.println(timezoneOffset/3600);
