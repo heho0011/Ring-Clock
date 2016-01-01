@@ -49,26 +49,53 @@ void DataStoreClass::unregisterObserver(DSKey key, ObserverFunction observer) {
     }
 }
 
+void DataStoreClass::registerValidator(DSKey key, ValidatorFunction validator) {
+
+    validators[key].push_back(validator);
+}
+
+void DataStoreClass::unregisterValidator(DSKey key, ValidatorFunction validator) {
+
+    for (auto it = validators[key].begin(); it != validators[key].end(); it++) {
+        if (*it == validator) {
+            validators[key].erase(it);
+        }
+    }
+}
+
 int DataStoreClass::get(DSKey key) {
 
     return store[key];
 }
 
-void DataStoreClass::set(DSKey key, int value) {
+bool DataStoreClass::set(DSKey key, int value) {
 
     // Ignore unchanged values
-    if (value != store[key]) {
+    if (value == store[key]) {
+        return true;
+    }
 
-        store[key] = value;
-        
-        EEPROM.put(key * sizeof(int), value);
-        EEPROM.commit();
+    // Validate the new value
+    for (auto& it : validators[key]) {
 
-        // Notify the observers
-        for (auto& it : observers[key]) {
-            (it)(key, value);
+        if (!(it)(key, value)) {
+            // Value was rejected
+            return false;
         }
     }
+
+    // All validators accepted. Commit the new value.
+    store[key] = value;
+    
+    EEPROM.put(key * sizeof(int), value);
+    EEPROM.commit();
+
+    // Notify the observers
+    for (auto& it : observers[key]) {
+        (it)(key, value);
+    }
+
+    return true;
 }
 
 DataStoreClass DataStore;

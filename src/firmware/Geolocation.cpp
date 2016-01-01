@@ -2,6 +2,7 @@
 #include "Geolocation.h"
 #include "InternetTime.h"
 #include "DataStore.h"
+#include "timezones.h"
 #include <Time.h>
 
 #define TIMEOUT                     2000 // ms
@@ -18,9 +19,16 @@ void onTimezoneUpdate(DSKey key, int value) {
     setTime(currentTime);
 }
 
+bool timezoneValidator(DSKey key, int value) {
+
+    // Make sure the value is within the array bounds
+    return (value < NUM_TIMEZONES && value >= 0);
+}
+
 void GeolocationClass::begin() {
 
     DataStore.registerObserver(DS_TIMEZONE, &onTimezoneUpdate);
+    DataStore.registerValidator(DS_TIMEZONE, &timezoneValidator);
     updatePosition();
 }
 

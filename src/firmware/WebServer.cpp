@@ -1,6 +1,5 @@
 #include "WebServer.h"
 #include "DataStore.h"
-#include "timezones.h"
 #include "FS.h"
 
 #define WEBSERVER_DOMAIN                "clock" // Without the .local ending
@@ -24,7 +23,7 @@ void WebServerClass::begin() {
     server.on("/settings/get", [this]() {
         handleSettingsGet();
     });
-    
+
     server.on("/debug/reset", [this]() {
         handleReset();
     });
@@ -40,24 +39,19 @@ void WebServerClass::handleClients() {
 
 void WebServerClass::handleSettingsSave() {
 
+    // Keeps track whether any of the settings failed
     bool isSuccess = true;
 
     if (server.hasArg("tz")) {
 
         int tz = server.arg("tz").toInt();
-        DataStore.set(DS_TIMEZONE, tz);
+        isSuccess = isSuccess && DataStore.set(DS_TIMEZONE, tz);
     }
 
     if (server.hasArg("brightness")) {
 
         int brightness = server.arg("brightness").toInt();
-
-        // Make sure input is between 1 and 100
-        if (brightness >= 0 && brightness <= 100) {
-            DataStore.set(DS_BRIGHTNESS, brightness);
-        } else {
-            isSuccess = false;
-        }
+        isSuccess = isSuccess && DataStore.set(DS_BRIGHTNESS, brightness);
     }
 
     if (server.hasArg("hour_color")) {
@@ -66,11 +60,7 @@ void WebServerClass::handleSettingsSave() {
 
         // Convert the hex string to an int. Offset to remove the preceding #
         int color = (int)strtol( &colorCode[1], NULL, 16);
-        if (color <= 0xffffff && color >= 0x000000) {
-            DataStore.set(DS_HOUR_COLOR, color);
-        } else {
-            isSuccess = false;
-        }
+        isSuccess = isSuccess && DataStore.set(DS_HOUR_COLOR, color);
     }
 
     if (server.hasArg("minute_color")) {
@@ -79,11 +69,7 @@ void WebServerClass::handleSettingsSave() {
 
         // Convert the hex string to an int. Offset to remove the preceding #
         int color = (int)strtol( &colorCode[1], NULL, 16);
-        if (color <= 0xffffff && color >= 0x000000) {
-            DataStore.set(DS_MINUTE_COLOR, color);
-        } else {
-            isSuccess = false;
-        }
+        isSuccess = isSuccess && DataStore.set(DS_HOUR_COLOR, color);
     }
 
     if (server.hasArg("second_color")) {
@@ -92,11 +78,7 @@ void WebServerClass::handleSettingsSave() {
 
         // Convert the hex string to an int. Offset to remove the preceding #
         int color = (int)strtol( &colorCode[1], NULL, 16);
-        if (color <= 0xffffff && color >= 0x000000) {
-            DataStore.set(DS_SECOND_COLOR, color);
-        } else {
-            isSuccess = false;
-        }
+        isSuccess = isSuccess && DataStore.set(DS_HOUR_COLOR, color);
     }
 
     if (isSuccess) {

@@ -18,6 +18,18 @@ void onBrightnessUpdate(DSKey key, int value) {
     ClockDisplay.setBrightness(value);
 }
 
+bool brightnessValidator(DSKey key, int value) {
+
+    // Make sure that the value is between 0 and 100
+    return (value >= 0 && value <= 100);
+}
+
+bool colorValidator(DSKey key, int value) {
+
+    // Make sure the value is 24 bits
+    return (value <= 0xffffff && value >= 0x000000);
+}
+
 ClockDisplayClass::ClockDisplayClass(int numPixels, int pin, int settings)
     : pixels(numPixels, pin, settings) { }
 
@@ -27,6 +39,11 @@ void ClockDisplayClass::begin() {
 
     setBrightness(DataStore.get(DS_BRIGHTNESS));
     DataStore.registerObserver(DS_BRIGHTNESS, &onBrightnessUpdate);
+
+    DataStore.registerValidator(DS_BRIGHTNESS, &brightnessValidator);
+    DataStore.registerValidator(DS_HOUR_COLOR, &colorValidator);
+    DataStore.registerValidator(DS_MINUTE_COLOR, &colorValidator);
+    DataStore.registerValidator(DS_SECOND_COLOR, &colorValidator);
 }
 
 void ClockDisplayClass::update() {
