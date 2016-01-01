@@ -24,8 +24,8 @@ void SettingsClass::begin() {
 
     SPIFFS.begin();
 
-    server.serveStatic("/", SPIFFS, "/settings.html");
-    server.serveStatic("/settings.js", SPIFFS, "/settings.js");
+    server.serveStatic("/", SPIFFS, "/settings.html", "max-age=86400");
+    server.serveStatic("/settings.js", SPIFFS, "/settings.js", "max-age=86400");
 
     server.on("/saveSettings", [this](){
         
@@ -41,6 +41,13 @@ void SettingsClass::begin() {
     server.on("/getSettings", [this](){
         
         server.send(200, "application/json", buildJSON());
+    });
+
+    server.on("/debug/reset", [this](){
+        
+        server.send(200, "text/plain", "OK");
+        Serial.println("System is going down for reset now!");
+        ESP.restart();
     });
 
     server.begin();
