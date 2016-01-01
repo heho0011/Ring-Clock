@@ -13,7 +13,8 @@
 #include <EEPROM.h>
 
 #include "config.h"
-#include "Settings.h"
+#include "DataStore.h"
+#include "WebServer.h"
 #include "Geolocation.h"
 #include "InternetTime.h"
 #include "ClockDisplay.h"
@@ -33,7 +34,8 @@ void setup() {
 
     printWiFiInfo();
 
-    Settings.begin();
+    DataStore.begin();
+    WebServer.begin();
     Geolocation.begin();
     InternetTime.begin(TIME_SERVER, SYNC_INTERVAL);
     ClockDisplay.begin();
@@ -44,7 +46,8 @@ void setup() {
 void loop() {
 
     ClockDisplay.update();
-    Settings.handleClients();
+    
+    WebServer.handleClients();
 }
 
 /**

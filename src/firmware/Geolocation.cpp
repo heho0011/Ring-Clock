@@ -1,7 +1,7 @@
 #include "config.h"
 #include "Geolocation.h"
 #include "InternetTime.h"
-#include "Settings.h"
+#include "DataStore.h"
 #include <Time.h>
 
 #define TIMEOUT                     2000 // ms
@@ -11,7 +11,7 @@
 
 extern String timezones[];
 
-void onTimezoneUpdate(Key key, int value) {
+void onTimezoneUpdate(DSKey key, int value) {
 
     Serial.println("Timezone updated!");
     time_t currentTime = InternetTime.getTime();
@@ -20,7 +20,7 @@ void onTimezoneUpdate(Key key, int value) {
 
 void GeolocationClass::begin() {
 
-    Settings.registerObserver(SET_TIMEZONE, &onTimezoneUpdate);
+    DataStore.registerObserver(DS_TIMEZONE, &onTimezoneUpdate);
     updatePosition();
 }
 
@@ -29,7 +29,7 @@ int GeolocationClass::getTimezoneOffset() {
     // Update timezone every request so that DST is handled
     if (!updateTimezone()) {
 
-        timezoneOffset = Settings.get(SET_LAST_TIMEZONE_OFFSET);
+        timezoneOffset = DataStore.get(DS_LAST_TIMEZONE_OFFSET);
 
         Serial.print("Using previously detected timezone: ");
         Serial.println(timezoneOffset/3600);
@@ -96,7 +96,7 @@ bool GeolocationClass::updateTimezone() {
 
     String url = "/?format=json";
 
-    int selectedTimezone = Settings.get(SET_TIMEZONE);
+    int selectedTimezone = DataStore.get(DS_TIMEZONE);
     bool autoDetectTimezone = (selectedTimezone == 0);
 
     if (autoDetectTimezone) {
@@ -122,7 +122,15 @@ bool GeolocationClass::updateTimezone() {
     }
 
     // Wait for response to arrive
-    while (!wifi.available()) { }
+    time_t requestTime = millis();
+    while (!wifi.available() &&
+        (millis() - requestTime) < TIMEOUT) { }
+
+    // Handle timeouts
+    if (millis() - requestTime >= TIMEOUT) {
+        Serial.println("Request timed out.");
+        return false;
+    }
 
     // Read the response
     
@@ -141,7 +149,7 @@ bool GeolocationClass::updateTimezone() {
         timezoneOffset = wifi.readStringUntil('\"').toFloat();
     }
     
-    Settings.set(SET_LAST_TIMEZONE_OFFSET, timezoneOffset);
+    DataStore.set(DS_LAST_TIMEZONE_OFFSET, timezoneOffset);
 
     Serial.print("Detected timezone: ");
     Serial.println(timezoneOffset/3600);

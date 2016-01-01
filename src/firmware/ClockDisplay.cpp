@@ -1,5 +1,5 @@
 #include "ClockDisplay.h"
-#include "Settings.h"
+#include "DataStore.h"
 
 #define NEOPIXELS_PIN       2
 #define NEOPIXELS_NUM       60
@@ -12,7 +12,7 @@
 
 #define GAMMA               2.8
 
-void onBrightnessUpdate(Key key, int value) {
+void onBrightnessUpdate(DSKey key, int value) {
 
     Serial.println("Brightness updated!");
     ClockDisplay.setBrightness(value);
@@ -25,8 +25,8 @@ void ClockDisplayClass::begin() {
 
     pixels.begin();
 
-    setBrightness(Settings.get(SET_BRIGHTNESS));
-    Settings.registerObserver(SET_BRIGHTNESS, &onBrightnessUpdate);
+    setBrightness(DataStore.get(DS_BRIGHTNESS));
+    DataStore.registerObserver(DS_BRIGHTNESS, &onBrightnessUpdate);
 }
 
 void ClockDisplayClass::update() {
@@ -61,15 +61,15 @@ void ClockDisplayClass::displayTime(time_t t) {
             uint32_t color = 0x000000;
 
             if (i == currentSecond) {
-                color |= Settings.get(SET_SECOND_COLOR);
+                color |= DataStore.get(DS_SECOND_COLOR);
             }
 
             if (i == currentMinute) {
-                color |= Settings.get(SET_MINUTE_COLOR);
+                color |= DataStore.get(DS_MINUTE_COLOR);
             }
 
             if (i == hourPixel) {
-                color |= Settings.get(SET_HOUR_COLOR);
+                color |= DataStore.get(DS_HOUR_COLOR);
             }
 
             pixels.setPixelColor(i, perceived(color));

@@ -17,7 +17,7 @@ function intToHexColor(int) {
     return "#" + ("000000" + int.toString(16)).substr(-6);
 }
 
-$.ajax("/getSettings").done(function(settings) {
+$.ajax("get").done(function(settings) {
 
     // Display the settings on the page
     $("#tz > option[value=" + settings.timezone + "]").prop("selected", true);
