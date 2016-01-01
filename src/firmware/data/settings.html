@@ -20,8 +20,8 @@
     <form action="/saveSettings" method="POST" class="form-horizontal">
       <div class="form-group">
         <label for="tz" class="col-sm-2 control-label">Time zone:</label>
-        <div class="col-sm-10">
-          <select name="tz" id="tz" class="form-control col-sm-10">
+        <div class="col-sm-3">
+          <select name="tz" id="tz" class="form-control">
             <option value="0">Auto-detect</option>
             <option value="1">Africa/Abidjan</option>
             <option value="2">Africa/Accra</option>
@@ -445,36 +445,39 @@
       </div>
 
       <div class="form-group">
-        <label for="brightness" class="col-sm-2 control-label">Brightness (0-100):</label>
-        <div class="col-sm-10">
-          <input name="brightness" id="brightness" class="form-control"
-              type="number" min="0" max="100" value="100" />
+        <label for="brightness" class="col-sm-2 control-label">Brightness:</label>
+        <div class="col-sm-3">
+          <div class="input-group">
+            <input name="brightness" id="brightness" class="form-control"
+                type="number" min="0" max="100" value="100" />
+            <div class="input-group-addon">%</div>
+          </div>
         </div>
       </div>
 
       <div class="form-group">
         <label for="hour-color" class="col-sm-2 control-label">Hour color:</label>
-        <div class="col-sm-10">
+        <div class="col-sm-3">
           <input name="hour_color" id="hour-color" class="form-control" type="color" value="#0000ff" />
         </div>
       </div>
 
       <div class="form-group">
         <label for="minute-color" class="col-sm-2 control-label">Minute color:</label>
-        <div class="col-sm-10">
+        <div class="col-sm-3">
           <input name="minute_color" id="minute-color" class="form-control" type="color" value="#00ff00" />
         </div>
       </div>
 
       <div class="form-group">
         <label for="second-color" class="col-sm-2 control-label">Second color:</label>
-        <div class="col-sm-10">
+        <div class="col-sm-3">
           <input name="second_color" id="second-color" class="form-control" type="color" value="#ff0000" />
         </div>
       </div>
 
       <div class="form-group">
-        <div class="col-sm-10 col-sm-offset-2">
+        <div class="col-sm-3 col-sm-offset-2">
           <input id="save-button" class="btn btn-primary" type="submit" value="Save" />
         </div>
       </div>
