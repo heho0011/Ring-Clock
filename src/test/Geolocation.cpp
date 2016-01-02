@@ -1,22 +1,23 @@
 #include "config.h"
 #include "Geolocation.h"
-#include "InternetTime.h"
+// #include "InternetTime.h"
 #include "DataStore.h"
-#include "timezones.h"
+// #include "timezones.h"
 #include <Time.h>
 
+#define NUM_TIMEZONES               418
 #define TIMEOUT                     2000 // ms
 #define MAX_CONNECTION_ATTEMPTS     3
 #define LOCATION_SERVICE_HOST       "ipinfo.io"
 #define TIMEZONE_SERVICE_HOST       "api.timezonedb.com"
 
-extern const char* timezones[];
+extern String timezones[];
 
 void onTimezoneUpdate(DSKey key, int value) {
 
     Serial.println("Timezone updated!");
-    time_t currentTime = InternetTime.getTime();
-    setTime(currentTime);
+    // time_t currentTime = InternetTime.getTime();
+    // setTime(currentTime);
 }
 
 bool timezoneValidator(DSKey key, int value) {
@@ -27,8 +28,8 @@ bool timezoneValidator(DSKey key, int value) {
 
 void GeolocationClass::begin() {
 
-    DataStore.registerObserver(DS_TIMEZONE, &onTimezoneUpdate);
-    DataStore.registerValidator(DS_TIMEZONE, &timezoneValidator);
+    // DataStore.registerObserver(DS_TIMEZONE, &onTimezoneUpdate);
+    // DataStore.registerValidator(DS_TIMEZONE, &timezoneValidator);
     updatePosition();
 }
 
@@ -37,7 +38,7 @@ int GeolocationClass::getTimezoneOffset() {
     // Update timezone every request so that DST is handled
     if (!updateTimezone()) {
 
-        timezoneOffset = DataStore.get(DS_LAST_TIMEZONE_OFFSET);
+        // timezoneOffset = DataStore.get(DS_LAST_TIMEZONE_OFFSET);
 
         Serial.print("Using previously detected timezone: ");
         Serial.println(timezoneOffset/3600);
@@ -104,7 +105,7 @@ bool GeolocationClass::updateTimezone() {
 
     String url = "/?format=json";
 
-    int selectedTimezone = DataStore.get(DS_TIMEZONE);
+    int selectedTimezone = 0; // DataStore.get(DS_TIMEZONE);
     bool autoDetectTimezone = (selectedTimezone == 0);
 
     if (autoDetectTimezone) {
@@ -119,9 +120,7 @@ bool GeolocationClass::updateTimezone() {
         url += "&lng=" + String(getLongitude());
 
     } else {
-        char tzBuffer[40];
-        strcpy_P(tzBuffer, (char*)pgm_read_word(&(timezones[selectedTimezone])));
-        url += "&zone=" + String(tzBuffer);
+        url += "&zone=" + timezones[selectedTimezone];
     }
 
 
@@ -159,7 +158,7 @@ bool GeolocationClass::updateTimezone() {
         timezoneOffset = wifi.readStringUntil('\"').toFloat();
     }
     
-    DataStore.set(DS_LAST_TIMEZONE_OFFSET, timezoneOffset);
+    // DataStore.set(DS_LAST_TIMEZONE_OFFSET, timezoneOffset);
 
     Serial.print("Detected timezone: ");
     Serial.println(timezoneOffset/3600);
@@ -199,4 +198,4 @@ bool GeolocationClass::httpGet(const String hostname, const String url) {
     return true;
 }
 
-GeolocationClass Geolocation;
+// GeolocationClass Geolocation;
