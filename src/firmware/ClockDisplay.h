@@ -4,7 +4,7 @@
 #include <Adafruit_NeoPixel.h>
 
 /**
- * A class to retrieve the current time from the internet.
+ * Displays data on the clock.
  */
 class ClockDisplayClass {
 

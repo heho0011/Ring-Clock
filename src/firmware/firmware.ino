@@ -45,6 +45,14 @@ void setup() {
 
 void loop() {
 
+    static int lastSize = 0;
+    int currentSize = ESP.getFreeHeap();
+    if (currentSize != lastSize) {
+        lastSize = currentSize;
+        Serial.print("Heap: ");
+        Serial.println(currentSize);
+    }
+
     ClockDisplay.update();
     
     WebServer.handleClients();

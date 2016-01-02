@@ -13,8 +13,14 @@ void WebServerClass::begin() {
 
     SPIFFS.begin();
 
+    server.serveStatic("/dummy.txt", SPIFFS, "/dummy.txt");
     server.serveStatic("/settings/", SPIFFS, "/settings/index.html", "max-age=86400");
     server.serveStatic("/settings/settings.js", SPIFFS, "/settings/settings.js", "max-age=86400");
+
+    server.on("/", [this]() {
+        server.sendHeader("Location", "/settings/");
+        server.send(302);
+    });
 
     server.on("/settings/save", [this]() {
         handleSettingsSave();
@@ -31,6 +37,32 @@ void WebServerClass::begin() {
     server.begin();
     Serial.println("Web server is running at http://" WEBSERVER_DOMAIN ".local");
 }
+
+// void WebServerClass::serveStatic(const char* uri, fs::FS& fs, const char* path, const char* cache_header) {
+
+//     server.on(uri, [this, fs, path]() {
+
+//         WiFiClient client = server.client();
+
+//         File f = SPIFFS.open(path, "r");
+//         int size = f.size();
+
+//         client.println("HTTP/1.1 200 OK");
+//         client.println("Content-Type: text/plain");
+//         client.println("Content-Length: " + String(size));
+//         client.println("Connection: close");
+//         client.println("Access-Control-Allow-Origin: *");
+//         client.println();
+
+//         f.setTimeout(50);
+
+//         while (f.available() || (f.position() < (size - 1))) {
+//             client.println(f.readStringUntil('\n'));
+//         }
+
+//         f.close();
+//     });
+// }
 
 void WebServerClass::handleClients() {
 
@@ -82,9 +114,9 @@ void WebServerClass::handleSettingsSave() {
     }
 
     if (isSuccess) {
-        server.sendHeader("Location", "/?status=success");
+        server.sendHeader("Location", "/settings/?status=success");
     } else {
-        server.sendHeader("Location", "/?status=error");
+        server.sendHeader("Location", "/settings/?status=error");
     }
     
     server.send(302);

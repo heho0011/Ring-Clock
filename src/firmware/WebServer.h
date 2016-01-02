@@ -7,7 +7,7 @@
 #include <ESP8266mDNS.h>
 
 /**
- * Manages the system settings and provides an interface for changing them.
+ * Manages the web server.
  */
 class WebServerClass {
     
@@ -35,6 +35,8 @@ private:
     void handleSettingsSave();
     void handleSettingsGet();
     void handleReset();
+    // void serveStatic(const char* uri, fs::FS& fs, const char* path, const char* cache_header = NULL);
+
 
     MDNSResponder mdns;
     ESP8266WebServer server;

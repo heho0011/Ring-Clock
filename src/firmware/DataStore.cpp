@@ -11,7 +11,9 @@
 void DataStoreClass::begin() {
 
     // Initialize the store to default values
+    // TODO: find a better way than hardcoding these values
     memset(&store, 0, sizeof(store));
+    store[DS_BRIGHTNESS] = 100;
     store[DS_HOUR_COLOR] = BLUE;
     store[DS_MINUTE_COLOR] = GREEN;
     store[DS_SECOND_COLOR] = RED;
