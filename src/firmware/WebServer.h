@@ -34,6 +34,7 @@ public:
 
 private:
 
+    bool parse(String key, String value);
     void handleSettingsSave();
     void handleSettingsGet();
     void handleReset();

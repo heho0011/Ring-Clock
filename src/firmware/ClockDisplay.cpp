@@ -4,8 +4,6 @@
 #define NEOPIXELS_PIN       2
 #define NEOPIXELS_NUM       60
 
-#define DEBUG
-
 #define EXTRACT_RED(c)      (((c) & 0xff0000) >> 16)
 #define EXTRACT_GREEN(c)    (((c) & 0x00ff00) >> 8)
 #define EXTRACT_BLUE(c)     ((c) & 0x0000ff)
@@ -62,14 +60,9 @@ void ClockDisplayClass::displayTime(time_t t) {
     // Only update the strip when the time changes
     if (lastSecond != currentSecond) {
 
-#ifdef DEBUG
-        String message = String(currentHour);
-        message += ":";
-        message += String(currentMinute);
-        message += ":";
-        message += String(currentSecond);
-        Serial.println(message);
-#endif
+        Serial.println(String(currentHour) + ":" +
+                       String(currentMinute) + ":" +
+                       String(currentSecond));
 
         int hourPixel = (currentHour % 12) * 5 + currentMinute / 12;
         

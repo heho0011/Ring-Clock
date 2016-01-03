@@ -41,29 +41,58 @@ void WebServerClass::handleClients() {
     server.handleClient();
 }
 
+bool WebServerClass::parse(String key, String value) {
+
+    DSKey newKey;
+
+    if (key.equals("tz")) {
+        newKey = DS_TIMEZONE;
+    } else if (key.equals("brightness")) {
+        newKey = DS_BRIGHTNESS;
+    } else if (key.equals("hour_color")) {
+        newKey = DS_HOUR_COLOR;
+    } else if (key.equals("minute_color")) {
+        newKey = DS_MINUTE_COLOR;
+    } else if (key.equals("second_color")) {
+        newKey = DS_SECOND_COLOR;
+    } else {
+        return false;
+    }
+
+    int newVal;
+
+    switch(newKey) {
+
+        case DS_TIMEZONE:
+        case DS_BRIGHTNESS:
+            newVal = value.toInt();
+            break;
+
+        case DS_HOUR_COLOR:
+        case DS_MINUTE_COLOR:
+        case DS_SECOND_COLOR:
+            // Convert the hex string to an int. Offset to remove the preceding # symbol.
+            newVal = (int)strtol(&value[1], NULL, 16);
+            break;
+
+        default:
+            newVal = -1;
+            break;
+    }
+
+    Serial.println(key + "," + value + " -> " +
+                   String(newKey) + "," + String(newVal));
+
+    return DataStore.set(newKey, newVal);
+}
+
 void WebServerClass::handleSettingsSave() {
 
     // Keeps track whether any of the settings failed
     bool isSuccess = true;
 
-    if (server.hasArg("tz")) {
-        isSuccess = isSuccess && DataStore.set(DS_TIMEZONE, server.arg("tz"));
-    }
-
-    if (server.hasArg("brightness")) {
-        isSuccess = isSuccess && DataStore.set(DS_BRIGHTNESS, server.arg("brightness"));
-    }
-
-    if (server.hasArg("hour_color")) {
-        isSuccess = isSuccess && DataStore.set(DS_HOUR_COLOR, server.arg("hour_color"));
-    }
-
-    if (server.hasArg("minute_color")) {
-        isSuccess = isSuccess && DataStore.set(DS_MINUTE_COLOR, server.arg("minute_color"));
-    }
-
-    if (server.hasArg("second_color")) {
-        isSuccess = isSuccess && DataStore.set(DS_SECOND_COLOR, server.arg("second_color"));
+    for (int i = 0; i < server.args(); i++) {
+        isSuccess = isSuccess && parse(server.argName(i), server.arg(i));
     }
 
     if (isSuccess) {

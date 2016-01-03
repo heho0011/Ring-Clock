@@ -76,16 +76,6 @@ public:
     void unregisterValidator(DSKey key, ValidatorFunction observer);
 
     /**
-     * Parses an argument from the webserver into a format that can be stored.
-     *
-     * @param[in]  key    The relevant key
-     * @param[in]  value  The value to parse
-     *
-     * @return     A value that can be stored
-     */
-    int parse(DSKey key, String value);
-
-    /**
      * Gets a value.
      *
      * @param[in]  key    The key to get
@@ -103,16 +93,6 @@ public:
      * @return      Whether the value was acceptable
      */
     bool set(DSKey key, int value);
-
-    /**
-     * Sets a value from a webserver argument.
-     *
-     * @param[in]  key   The key to set
-     * @param[in]  key   The value to change it to, from the webserver
-     * 
-     * @return      Whether the value was acceptable
-     */
-    bool set(DSKey key, String value);
 
 private:
 

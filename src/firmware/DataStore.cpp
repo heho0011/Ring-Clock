@@ -65,25 +65,6 @@ void DataStoreClass::unregisterValidator(DSKey key, ValidatorFunction validator)
     }
 }
 
-int DataStoreClass::parse(DSKey key, String value) {
-
-    switch(key) {
-
-        case DS_TIMEZONE:
-        case DS_BRIGHTNESS:
-            return value.toInt();
-
-        case DS_HOUR_COLOR:
-        case DS_MINUTE_COLOR:
-        case DS_SECOND_COLOR:
-            // Convert the hex string to an int. Offset to remove the preceding # symbol.
-            return (int)strtol(&value[1], NULL, 16);
-
-        default:
-            return -1;
-    }
-}
-
 int DataStoreClass::get(DSKey key) {
 
     return store[key];
@@ -117,12 +98,6 @@ bool DataStoreClass::set(DSKey key, int value) {
     }
 
     return true;
-}
-
-bool DataStoreClass::set(DSKey key, String value) {
-
-    int newVal = parse(key, value);
-    return set(key, newVal);
 }
 
 DataStoreClass DataStore;
