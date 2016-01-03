@@ -10,7 +10,7 @@
 #define LOCATION_SERVICE_HOST       "ipinfo.io"
 #define TIMEZONE_SERVICE_HOST       "api.timezonedb.com"
 
-extern const char* timezones[];
+extern const String timezones[];
 
 void onTimezoneUpdate(DSKey key, int value) {
 
@@ -119,9 +119,7 @@ bool GeolocationClass::updateTimezone() {
         url += "&lng=" + String(getLongitude());
 
     } else {
-        char tzBuffer[40];
-        strcpy_P(tzBuffer, (char*)pgm_read_word(&(timezones[selectedTimezone])));
-        url += "&zone=" + String(tzBuffer);
+        url += "&zone=" + timezones[selectedTimezone];
     }
 
 

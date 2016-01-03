@@ -102,7 +102,7 @@ void WebServerClass::handleSettingsSave() {
 
         // Convert the hex string to an int. Offset to remove the preceding #
         int color = (int)strtol( &colorCode[1], NULL, 16);
-        isSuccess = isSuccess && DataStore.set(DS_HOUR_COLOR, color);
+        isSuccess = isSuccess && DataStore.set(DS_MINUTE_COLOR, color);
     }
 
     if (server.hasArg("second_color")) {
@@ -111,7 +111,7 @@ void WebServerClass::handleSettingsSave() {
 
         // Convert the hex string to an int. Offset to remove the preceding #
         int color = (int)strtol( &colorCode[1], NULL, 16);
-        isSuccess = isSuccess && DataStore.set(DS_HOUR_COLOR, color);
+        isSuccess = isSuccess && DataStore.set(DS_SECOND_COLOR, color);
     }
 
     if (isSuccess) {
