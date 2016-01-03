@@ -1,8 +1,8 @@
 #include "InternetTime.h"
 #include "Geolocation.h"
+#include "DataStore.h"
 #include <ESP8266WiFi.h>
 
-#define HTTP_PORT           80
 #define UDP_IN_PORT         2390
 #define NTP_OUT_PORT        123
 #define TIMEOUT             2000 // ms
@@ -49,18 +49,27 @@ double fixedToFloat(uint64_t ntp) {
     return (double)seconds + (double)fraction/(1ULL << 32);
 }
 
+time_t updateTime() {
+    return InternetTime.getTime();
+}
+
+void onTimezoneUpdate(DSKey key, int value) {
+
+    Serial.println("Timezone updated!");
+    time_t currentTime = updateTime();
+    setTime(currentTime);
+}
+
 InternetTimeClass::InternetTimeClass() {
 
     lastSyncTime = 0;
 }
 
-time_t updateTime() {
-    return InternetTime.getTime();
-}
-
 void InternetTimeClass::begin(const char* timeServer, time_t interval) {
 
     hostname = timeServer;
+
+    DataStore.registerObserver(DS_TIMEZONE, &onTimezoneUpdate);
 
     precision = calculatePrecision();
 

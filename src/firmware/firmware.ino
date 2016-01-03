@@ -35,7 +35,7 @@ void setup() {
     printWiFiInfo();
 
     DataStore.begin();
-    WebServer.begin();
+    WebServer.begin(WEBSERVER_DOMAIN);
     Geolocation.begin();
     InternetTime.begin(TIME_SERVER, SYNC_INTERVAL);
     ClockDisplay.begin();

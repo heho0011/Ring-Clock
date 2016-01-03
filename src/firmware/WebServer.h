@@ -20,8 +20,10 @@ public:
 
     /**
      * Initializes the store and web server.
+     * 
+     * @param[in] domain        The domain that the server will be available it
      */
-    void begin();
+    void begin(const char* domain);
 
     /**
      * Handles incoming connections.

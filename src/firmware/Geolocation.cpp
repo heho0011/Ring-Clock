@@ -12,13 +12,6 @@
 
 extern const String timezones[];
 
-void onTimezoneUpdate(DSKey key, int value) {
-
-    Serial.println("Timezone updated!");
-    time_t currentTime = InternetTime.getTime();
-    setTime(currentTime);
-}
-
 bool timezoneValidator(DSKey key, int value) {
 
     // Make sure the value is within the array bounds
@@ -27,7 +20,6 @@ bool timezoneValidator(DSKey key, int value) {
 
 void GeolocationClass::begin() {
 
-    DataStore.registerObserver(DS_TIMEZONE, &onTimezoneUpdate);
     DataStore.registerValidator(DS_TIMEZONE, &timezoneValidator);
     updatePosition();
 }

@@ -2,14 +2,12 @@
 #include "DataStore.h"
 #include "FS.h"
 
-#define WEBSERVER_DOMAIN                "clock" // Without the .local ending
-
 WebServerClass::WebServerClass()
     : server(80) { }
 
-void WebServerClass::begin() {
+void WebServerClass::begin(const char* domain) {
 
-    mdns.begin(WEBSERVER_DOMAIN, WiFi.localIP());
+    mdns.begin(domain, WiFi.localIP());
 
     SPIFFS.begin();
 
@@ -35,7 +33,7 @@ void WebServerClass::begin() {
     });
 
     server.begin();
-    Serial.println("Web server is running at http://" WEBSERVER_DOMAIN ".local");
+    Serial.println("Web server is running at http://" + String(domain) + ".local");
 }
 
 void WebServerClass::handleClients() {

@@ -13,3 +13,6 @@
 // A TimeZoneDB account is necessary to determine the timezone.
 // You will need to create a free account at http://www.timezonedb.com/
 #define TIMEZONE_SERVICE_KEY   "Your TimeZoneDB API Key"
+
+// This is the domain that the web server will be available at
+#define WEBSERVER_DOMAIN        "clock" // Without the .local ending
