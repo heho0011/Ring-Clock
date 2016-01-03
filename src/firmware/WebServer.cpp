@@ -14,7 +14,6 @@ void WebServerClass::begin() {
     SPIFFS.begin();
 
     server.serveStatic("/dummy.txt", SPIFFS, "/dummy.txt");
-    server.serveStatic("/settings/dummy2.txt", SPIFFS, "/settings/dummy2.txt");
     server.serveStatic("/settings/", SPIFFS, "/settings/index.html", "max-age=86400");
     server.serveStatic("/settings/settings.js", SPIFFS, "/settings/settings.js", "max-age=86400");
 
