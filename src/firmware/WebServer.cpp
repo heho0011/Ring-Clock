@@ -47,42 +47,23 @@ void WebServerClass::handleSettingsSave() {
     bool isSuccess = true;
 
     if (server.hasArg("tz")) {
-
-        int tz = server.arg("tz").toInt();
-        isSuccess = isSuccess && DataStore.set(DS_TIMEZONE, tz);
+        isSuccess = isSuccess && DataStore.set(DS_TIMEZONE, server.arg("tz"));
     }
 
     if (server.hasArg("brightness")) {
-
-        int brightness = server.arg("brightness").toInt();
-        isSuccess = isSuccess && DataStore.set(DS_BRIGHTNESS, brightness);
+        isSuccess = isSuccess && DataStore.set(DS_BRIGHTNESS, server.arg("brightness"));
     }
 
     if (server.hasArg("hour_color")) {
-
-        String colorCode = server.arg("hour_color");
-
-        // Convert the hex string to an int. Offset to remove the preceding #
-        int color = (int)strtol( &colorCode[1], NULL, 16);
-        isSuccess = isSuccess && DataStore.set(DS_HOUR_COLOR, color);
+        isSuccess = isSuccess && DataStore.set(DS_HOUR_COLOR, server.arg("hour_color"));
     }
 
     if (server.hasArg("minute_color")) {
-
-        String colorCode = server.arg("minute_color");
-
-        // Convert the hex string to an int. Offset to remove the preceding #
-        int color = (int)strtol( &colorCode[1], NULL, 16);
-        isSuccess = isSuccess && DataStore.set(DS_MINUTE_COLOR, color);
+        isSuccess = isSuccess && DataStore.set(DS_MINUTE_COLOR, server.arg("minute_color"));
     }
 
     if (server.hasArg("second_color")) {
-
-        String colorCode = server.arg("second_color");
-
-        // Convert the hex string to an int. Offset to remove the preceding #
-        int color = (int)strtol( &colorCode[1], NULL, 16);
-        isSuccess = isSuccess && DataStore.set(DS_SECOND_COLOR, color);
+        isSuccess = isSuccess && DataStore.set(DS_SECOND_COLOR, server.arg("second_color"));
     }
 
     if (isSuccess) {
