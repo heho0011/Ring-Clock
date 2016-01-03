@@ -35,7 +35,7 @@ private:
     void handleSettingsSave();
     void handleSettingsGet();
     void handleReset();
-    // void serveStatic(const char* uri, fs::FS& fs, const char* path, const char* cache_header = NULL);
+    String getColorCode(int value);
 
 
     MDNSResponder mdns;

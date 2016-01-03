@@ -39,32 +39,6 @@ void WebServerClass::begin() {
     Serial.println("Web server is running at http://" WEBSERVER_DOMAIN ".local");
 }
 
-// void WebServerClass::serveStatic(const char* uri, fs::FS& fs, const char* path, const char* cache_header) {
-
-//     server.on(uri, [this, fs, path]() {
-
-//         WiFiClient client = server.client();
-
-//         File f = SPIFFS.open(path, "r");
-//         int size = f.size();
-
-//         client.println("HTTP/1.1 200 OK");
-//         client.println("Content-Type: text/plain");
-//         client.println("Content-Length: " + String(size));
-//         client.println("Connection: close");
-//         client.println("Access-Control-Allow-Origin: *");
-//         client.println();
-
-//         f.setTimeout(50);
-
-//         while (f.available() || (f.position() < (size - 1))) {
-//             client.println(f.readStringUntil('\n'));
-//         }
-
-//         f.close();
-//     });
-// }
-
 void WebServerClass::handleClients() {
 
     server.handleClient();
@@ -129,13 +103,29 @@ void WebServerClass::handleSettingsGet() {
     
     json.concat("\"timezone\":" + String(DataStore.get(DS_TIMEZONE)));
     json.concat(",\"brightness\":" + String(DataStore.get(DS_BRIGHTNESS)));
-    json.concat(",\"hour_color\":" + String(DataStore.get(DS_HOUR_COLOR)));
-    json.concat(",\"minute_color\":" + String(DataStore.get(DS_MINUTE_COLOR)));
-    json.concat(",\"second_color\":" + String(DataStore.get(DS_SECOND_COLOR)));
+    json.concat(",\"hour_color\":" + getColorCode(DataStore.get(DS_HOUR_COLOR)));
+    json.concat(",\"minute_color\":" + getColorCode(DataStore.get(DS_MINUTE_COLOR)));
+    json.concat(",\"second_color\":" + getColorCode(DataStore.get(DS_SECOND_COLOR)));
 
     json.concat("}");
     
     server.send(200, "application/json", json);
+}
+
+String WebServerClass::getColorCode(int value) {
+
+    String s = String(value, HEX);
+    String hexString = "\"#";
+
+    for (int i = 6; i > s.length(); i--) {
+        hexString.concat("0");
+    }
+
+    hexString.concat(s);
+
+    hexString.concat("\"");
+
+    return hexString;
 }
 
 void WebServerClass::handleReset() {

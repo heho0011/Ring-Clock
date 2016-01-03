@@ -13,18 +13,14 @@ $(function() {
 
 $("#save-button").click(showLoadingMessage);
 
-function intToHexColor(int) {
-    return "#" + ("000000" + int.toString(16)).substr(-6);
-}
-
 $.ajax("get").done(function(settings) {
 
     // Display the settings on the page
     $("#tz > option[value=" + settings.timezone + "]").prop("selected", true);
     $("#brightness").val(settings.brightness);
-    $("#hour-color").val(intToHexColor(settings.hour_color));
-    $("#minute-color").val(intToHexColor(settings.minute_color));
-    $("#second-color").val(intToHexColor(settings.second_color));
+    $("#hour-color").val(settings.hour_color);
+    $("#minute-color").val(settings.minute_color);
+    $("#second-color").val(settings.second_color);
 
     $("form *").prop("disabled", false);
 
@@ -48,6 +44,5 @@ $.ajax("get").done(function(settings) {
         $("#alert")
             .removeClass("alert-info")
             .text("");
-
     }
 });
