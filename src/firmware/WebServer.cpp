@@ -14,6 +14,7 @@ void WebServerClass::begin() {
     SPIFFS.begin();
 
     server.serveStatic("/dummy.txt", SPIFFS, "/dummy.txt");
+    server.serveStatic("/settings/dummy2.txt", SPIFFS, "/settings/dummy2.txt");
     server.serveStatic("/settings/", SPIFFS, "/settings/index.html", "max-age=86400");
     server.serveStatic("/settings/settings.js", SPIFFS, "/settings/settings.js", "max-age=86400");
 
@@ -101,7 +102,7 @@ void WebServerClass::handleSettingsSave() {
 
         // Convert the hex string to an int. Offset to remove the preceding #
         int color = (int)strtol( &colorCode[1], NULL, 16);
-        isSuccess = isSuccess && DataStore.set(DS_HOUR_COLOR, color);
+        isSuccess = isSuccess && DataStore.set(DS_MINUTE_COLOR, color);
     }
 
     if (server.hasArg("second_color")) {
@@ -110,7 +111,7 @@ void WebServerClass::handleSettingsSave() {
 
         // Convert the hex string to an int. Offset to remove the preceding #
         int color = (int)strtol( &colorCode[1], NULL, 16);
-        isSuccess = isSuccess && DataStore.set(DS_HOUR_COLOR, color);
+        isSuccess = isSuccess && DataStore.set(DS_SECOND_COLOR, color);
     }
 
     if (isSuccess) {

@@ -4,7 +4,7 @@
 #define NEOPIXELS_PIN       2
 #define NEOPIXELS_NUM       60
 
-// #define DEBUG
+#define DEBUG
 
 #define EXTRACT_RED(c)      (((c) & 0xff0000) >> 16)
 #define EXTRACT_GREEN(c)    (((c) & 0x00ff00) >> 8)

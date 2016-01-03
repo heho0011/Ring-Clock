@@ -10,7 +10,7 @@
 #define LOCATION_SERVICE_HOST       "ipinfo.io"
 #define TIMEZONE_SERVICE_HOST       "api.timezonedb.com"
 
-extern String timezones[];
+extern const String timezones[];
 
 void onTimezoneUpdate(DSKey key, int value) {
 
