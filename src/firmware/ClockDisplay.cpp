@@ -10,7 +10,7 @@
 #define EXTRACT_GREEN(c)    (((c) & 0x00ff00) >> 8)
 #define EXTRACT_BLUE(c)     ((c) & 0x0000ff)
 
-#define GAMMA               2.8
+#define GAMMA               2.2
 
 void onBrightnessUpdate(DSKey key, int value) {
 
