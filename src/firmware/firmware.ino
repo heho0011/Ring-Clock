@@ -45,13 +45,7 @@ void setup() {
 
 void loop() {
 
-    static int lastSize = 0;
-    int currentSize = ESP.getFreeHeap();
-    if (currentSize != lastSize) {
-        lastSize = currentSize;
-        Serial.print("Heap: ");
-        Serial.println(currentSize);
-    }
+    printHeapSpace();
 
     ClockDisplay.update();
     
@@ -86,4 +80,18 @@ void printWiFiInfo() {
 
     Serial.print("Signal strength (RSSI): ");
     Serial.println(WiFi.RSSI());
+}
+
+/**
+ * Prints the amount of free heap space left if it's changed since last printed.
+ */
+void printHeapSpace() {
+
+    static int lastSize = 0;
+    int currentSize = ESP.getFreeHeap();
+    if (currentSize != lastSize) {
+        lastSize = currentSize;
+        Serial.print("Heap: ");
+        Serial.println(currentSize);
+    }
 }
