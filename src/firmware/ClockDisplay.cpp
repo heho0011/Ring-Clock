@@ -9,6 +9,7 @@
 #define EXTRACT_BLUE(c)     ((c) & 0x0000ff)
 
 #define GAMMA               2.2
+#define FPS                 20
 
 void onBrightnessUpdate(DSKey key, int value) {
 
@@ -28,6 +29,12 @@ bool colorValidator(DSKey key, int value) {
     return (value <= 0xffffff && value >= 0x000000);
 }
 
+bool animationValidator(DSKey key, int value) {
+
+    // Make sure the value is within the enum bounds
+    return (value < NUM_ANIMATIONS && value >= 0);
+}
+
 ClockDisplayClass::ClockDisplayClass(int numPixels, int pin, int settings)
     : pixels(numPixels, pin, settings) { }
 
@@ -42,6 +49,7 @@ void ClockDisplayClass::begin() {
     DataStore.registerValidator(DS_HOUR_COLOR, &colorValidator);
     DataStore.registerValidator(DS_MINUTE_COLOR, &colorValidator);
     DataStore.registerValidator(DS_SECOND_COLOR, &colorValidator);
+    DataStore.registerValidator(DS_CLOCK_ANIMATION, &animationValidator);
 }
 
 void ClockDisplayClass::update() {
@@ -50,6 +58,22 @@ void ClockDisplayClass::update() {
 }
 
 void ClockDisplayClass::displayTime(time_t t) {
+
+    int selectedAnimation = DataStore.get(DS_CLOCK_ANIMATION);
+
+    switch(selectedAnimation) {
+
+        case ANIM_DISCRETE:
+            discreteAnimation(t);
+            break;
+
+        case ANIM_CONTINUOUS:
+            continuousAnimation(t);
+            break;
+    }
+}
+
+void ClockDisplayClass::discreteAnimation(time_t t) {
 
     static int lastSecond = 0;
 
@@ -91,16 +115,100 @@ void ClockDisplayClass::displayTime(time_t t) {
     }
 }
 
-void ClockDisplayClass::setBrightness(int brightness) {
+void ClockDisplayClass::continuousAnimation(time_t t) {
+
+    static int lastSecond = 0;
+    static unsigned long lastAbsoluteMillis = 0;
+    static int millisAtSecondStart = 0;
+
+    unsigned long currentAbsoluteMillis = millis();
+    int currentMillis = (currentAbsoluteMillis - millisAtSecondStart) % 1000;
+    int currentSecond = second(t);
+    int currentMinute = minute(t);
+    int currentHour = hour(t);
+
+    if (lastSecond != currentSecond) {
+
+        Serial.println(String(currentHour) + ":" +
+                       String(currentMinute) + ":" +
+                       String(currentSecond));
+
+        lastSecond = currentSecond;
+        millisAtSecondStart = currentAbsoluteMillis % 1000;
+    }
+
+    // Only update the strip when the frame changes
+    if (currentAbsoluteMillis - lastAbsoluteMillis >= 1000/FPS) {
+
+        int currentSecondPixel = currentSecond;
+        int nextSecondPixel = (currentSecondPixel + 1) % 60;
+        int currentMinutePixel = currentMinute;
+        int nextMinutePixel = (currentMinutePixel + 1) % 60;
+        int currentHourPixel = (currentHour % 12) * 5 + currentMinute / 12;
+        int nextHourPixel = (currentHourPixel + 1) % 60;
+
+        float percentSinceCurrentSecondPixel = currentMillis / 1000.0;
+        float percentUntilNextSecondPixel = 1 - percentSinceCurrentSecondPixel;
+        float percentSinceCurrentMinutePixel = currentSecond / 60.0;
+        float percentUntilNextMinutePixel = 1 - percentSinceCurrentMinutePixel;
+        float percentSinceCurrentHourPixel = (currentMinute % 12) / 12.0;
+        float percentUntilNextHourPixel = 1 - percentSinceCurrentHourPixel;
+        
+        for (int i = 0; i < NEOPIXELS_NUM; i++) {
+
+            uint32_t color = 0x000000;
+
+            if (i == currentSecondPixel) {
+                color |= scaleColor(perceived(DataStore.get(DS_SECOND_COLOR)), percentUntilNextSecondPixel);
+            }
+
+            if (i == nextSecondPixel) {
+                color |= scaleColor(perceived(DataStore.get(DS_SECOND_COLOR)), percentSinceCurrentSecondPixel);
+            }
+
+            if (i == currentMinutePixel) {
+                color |= scaleColor(perceived(DataStore.get(DS_MINUTE_COLOR)), percentUntilNextMinutePixel);
+            }
+
+            if (i == nextMinutePixel) {
+                color |= scaleColor(perceived(DataStore.get(DS_MINUTE_COLOR)), percentSinceCurrentMinutePixel);
+            }
+
+            if (i == currentHourPixel) {
+                color |= scaleColor(perceived(DataStore.get(DS_HOUR_COLOR)), percentUntilNextHourPixel);
+            }
+
+            if (i == nextHourPixel) {
+                color |= scaleColor(perceived(DataStore.get(DS_HOUR_COLOR)), percentSinceCurrentHourPixel);
+            }
+
+            pixels.setPixelColor(i, color);
+        }
+
+        pixels.show();
+
+        lastAbsoluteMillis = currentAbsoluteMillis;
+    }
+}
+
+uint32_t ClockDisplayClass::scaleColor(uint32_t color, float scale) {
+
+    uint8_t red = constrain(scale * EXTRACT_RED(color), 0, 255);
+    uint8_t green = constrain(scale * EXTRACT_GREEN(color), 0, 255);
+    uint8_t blue = constrain(scale * EXTRACT_BLUE(color), 0, 255);
+
+    return pixels.Color(red, green, blue);
+}
+
+void ClockDisplayClass::setBrightness(int unscaledBrightness) {
 
     // Make sure input is valid
-    if (!brightnessValidator(DS_BRIGHTNESS, brightness)) {
+    if (!brightnessValidator(DS_BRIGHTNESS, unscaledBrightness)) {
         return;
     }
 
     // Scale the brightness 
-    uint8_t scaledBrightness = brightness * 255 / 100;
-    pixels.setBrightness(gamma(scaledBrightness));
+    brightness = unscaledBrightness / 100.0;
 }
 
 uint8_t ClockDisplayClass::gamma(uint8_t x) {
@@ -115,7 +223,7 @@ uint32_t ClockDisplayClass::perceived(uint32_t color) {
     uint8_t green = gamma(EXTRACT_GREEN(color));
     uint8_t blue = gamma(EXTRACT_BLUE(color));
 
-    return pixels.Color(red, green, blue);
+    return scaleColor(pixels.Color(red, green, blue), brightness);
 }
 
 ClockDisplayClass ClockDisplay(NEOPIXELS_NUM, NEOPIXELS_PIN, NEO_GRB + NEO_KHZ800);

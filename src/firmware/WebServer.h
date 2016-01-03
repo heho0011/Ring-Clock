@@ -38,6 +38,7 @@ private:
     void handleSettingsSave();
     void handleSettingsGet();
     void handleReset();
+    void handleResetSettings();
     String getColorCode(int value);
 
 

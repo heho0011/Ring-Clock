@@ -13,6 +13,12 @@ enum DSKey {
     DS_HOUR_COLOR,
     DS_MINUTE_COLOR,
     DS_SECOND_COLOR,
+    DS_CLOCK_ANIMATION,
+    DS_RESERVED1,
+    DS_RESERVED2,
+    DS_RESERVED3,
+    DS_RESERVED4,
+    DS_RESERVED5,
     DS_LAST_TIMEZONE_OFFSET,
 
     DS_NUM_KEYS
@@ -29,6 +35,11 @@ public:
      * Initializes the store.
      */
     void begin();
+
+    /**
+     * Formats the EEPROM, restoring all initial values.
+     */
+    void resetSettings();
 
     /**
      * Function signature for an observer function.

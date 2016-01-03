@@ -26,6 +26,7 @@ $.ajax("get").done(function(settings) {
     $("#hour-color").val(settings.hour_color);
     $("#minute-color").val(settings.minute_color);
     $("#second-color").val(settings.second_color);
+    $("#animation").val(settings.animation);
 
     $("form *").prop("disabled", false);
 

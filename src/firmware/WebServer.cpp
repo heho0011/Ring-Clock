@@ -32,6 +32,10 @@ void WebServerClass::begin(const char* domain) {
         handleReset();
     });
 
+    server.on("/debug/resetSettings", [this]() {
+        handleResetSettings();
+    });
+
     server.begin();
     Serial.println("Web server is running at http://" + String(domain) + ".local");
 }
@@ -55,6 +59,8 @@ bool WebServerClass::parse(String key, String value) {
         newKey = DS_MINUTE_COLOR;
     } else if (key.equals("second_color")) {
         newKey = DS_SECOND_COLOR;
+    } else if (key.equals("animation")) {
+        newKey = DS_CLOCK_ANIMATION;
     } else {
         return false;
     }
@@ -65,6 +71,7 @@ bool WebServerClass::parse(String key, String value) {
 
         case DS_TIMEZONE:
         case DS_BRIGHTNESS:
+        case DS_CLOCK_ANIMATION:
             newVal = value.toInt();
             break;
 
@@ -113,6 +120,7 @@ void WebServerClass::handleSettingsGet() {
     json.concat(",\"hour_color\":" + getColorCode(DataStore.get(DS_HOUR_COLOR)));
     json.concat(",\"minute_color\":" + getColorCode(DataStore.get(DS_MINUTE_COLOR)));
     json.concat(",\"second_color\":" + getColorCode(DataStore.get(DS_SECOND_COLOR)));
+    json.concat(",\"animation\":" + String(DataStore.get(DS_CLOCK_ANIMATION)));
 
     json.concat("}");
     
@@ -140,6 +148,13 @@ void WebServerClass::handleReset() {
     server.send(200, "text/plain", "OK");
     Serial.println("System is going down for reset now!");
     ESP.restart();
+}
+
+void WebServerClass::handleResetSettings() {
+
+    DataStore.resetSettings();
+    server.send(200, "text/plain", "OK");
+    Serial.println("Settings reset");
 }
 
 WebServerClass WebServer;

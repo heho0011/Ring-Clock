@@ -10,6 +10,21 @@
 
 void DataStoreClass::begin() {
 
+    EEPROM.begin(512);
+    
+    if (EEPROM.read(MAGIC_ADDRESS) != MAGIC_NUMBER) {
+
+        // EEPROM has never been written
+        resetSettings();
+
+    } else {
+        // Get the saved values from EEPROM
+        EEPROM.get(0, store);
+    }
+}
+
+void DataStoreClass::resetSettings() {
+
     // Initialize the store to default values
     // TODO: find a better way than hardcoding these values
     memset(&store, 0, sizeof(store));
@@ -18,23 +33,13 @@ void DataStoreClass::begin() {
     store[DS_MINUTE_COLOR] = GREEN;
     store[DS_SECOND_COLOR] = RED;
 
-    EEPROM.begin(512);
-    
-    if (EEPROM.read(MAGIC_ADDRESS) != MAGIC_NUMBER) {
+    // Set the EEPROM to the default store values
+    EEPROM.put(0, store);
 
-        // EEPROM has never been written
-        // Set the EEPROM to the default store values
-        EEPROM.put(0, store);
+    // Mark it as written
+    EEPROM.write(MAGIC_ADDRESS, MAGIC_NUMBER);
 
-        // Mark it as written
-        EEPROM.write(MAGIC_ADDRESS, MAGIC_NUMBER);
-
-        EEPROM.commit();
-
-    } else {
-        // Get the saved values from EEPROM
-        EEPROM.get(0, store);
-    }
+    EEPROM.commit();
 }
 
 void DataStoreClass::registerObserver(DSKey key, ObserverFunction observer) {

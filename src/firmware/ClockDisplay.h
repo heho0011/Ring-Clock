@@ -4,6 +4,17 @@
 #include <Adafruit_NeoPixel.h>
 
 /**
+ * Represents the various animations.
+ */
+enum Animation {
+
+    ANIM_DISCRETE,
+    ANIM_CONTINUOUS,
+
+    NUM_ANIMATIONS
+};
+
+/**
  * Displays data on the clock.
  */
 class ClockDisplayClass {
@@ -41,16 +52,21 @@ public:
     /**
      * Sets the brightness of the pixels.
      *
-     * @param[in]  brightness  The new brightness value between 1 and 100
+     * @param[in]  unscaledBrightness   The new brightness value between 1 and 100
      */
-    void setBrightness(int brightness);
+    void setBrightness(int unscaledBrightness);
 
 private:
 
+    void discreteAnimation(time_t t);
+    void continuousAnimation(time_t t);
+
     uint8_t gamma(uint8_t x);
     uint32_t perceived(uint32_t color);
+    uint32_t scaleColor(uint32_t color, float scale);
 
     Adafruit_NeoPixel pixels;
+    float brightness;
 };
 
 extern ClockDisplayClass ClockDisplay;
