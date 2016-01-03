@@ -13,11 +13,16 @@ $(function() {
 
 $("#save-button").click(showLoadingMessage);
 
+$("#brightness-slider").on("input", function() {
+    $("#brightness-value").text($(this).val() + "%");
+})
+
 $.ajax("get").done(function(settings) {
 
     // Display the settings on the page
     $("#tz > option[value=" + settings.timezone + "]").prop("selected", true);
-    $("#brightness").val(settings.brightness);
+    $("#brightness-slider").val(settings.brightness);
+    $("#brightness-value").text(settings.brightness + "%");
     $("#hour-color").val(settings.hour_color);
     $("#minute-color").val(settings.minute_color);
     $("#second-color").val(settings.second_color);
