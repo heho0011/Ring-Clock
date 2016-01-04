@@ -61,9 +61,10 @@ private:
     void discreteAnimation(time_t t);
     void continuousAnimation(time_t t);
 
+    uint32_t addColors(uint32_t a, uint32_t b);
+    uint32_t scaleColor(uint32_t color, float scale);
     uint8_t gamma(uint8_t x);
     uint32_t perceived(uint32_t color);
-    uint32_t scaleColor(uint32_t color, float scale);
 
     Adafruit_NeoPixel pixels;
     float brightness;

@@ -159,27 +159,27 @@ void ClockDisplayClass::continuousAnimation(time_t t) {
             uint32_t color = 0x000000;
 
             if (i == currentSecondPixel) {
-                color |= scaleColor(perceived(DataStore.get(DS_SECOND_COLOR)), percentUntilNextSecondPixel);
+                color = addColors(color, scaleColor(perceived(DataStore.get(DS_SECOND_COLOR)), percentUntilNextSecondPixel));
             }
 
             if (i == nextSecondPixel) {
-                color |= scaleColor(perceived(DataStore.get(DS_SECOND_COLOR)), percentSinceCurrentSecondPixel);
+                color = addColors(color, scaleColor(perceived(DataStore.get(DS_SECOND_COLOR)), percentSinceCurrentSecondPixel));
             }
 
             if (i == currentMinutePixel) {
-                color |= scaleColor(perceived(DataStore.get(DS_MINUTE_COLOR)), percentUntilNextMinutePixel);
+                color = addColors(color, scaleColor(perceived(DataStore.get(DS_MINUTE_COLOR)), percentUntilNextMinutePixel));
             }
 
             if (i == nextMinutePixel) {
-                color |= scaleColor(perceived(DataStore.get(DS_MINUTE_COLOR)), percentSinceCurrentMinutePixel);
+                color = addColors(color, scaleColor(perceived(DataStore.get(DS_MINUTE_COLOR)), percentSinceCurrentMinutePixel));
             }
 
             if (i == currentHourPixel) {
-                color |= scaleColor(perceived(DataStore.get(DS_HOUR_COLOR)), percentUntilNextHourPixel);
+                color = addColors(color, scaleColor(perceived(DataStore.get(DS_HOUR_COLOR)), percentUntilNextHourPixel));
             }
 
             if (i == nextHourPixel) {
-                color |= scaleColor(perceived(DataStore.get(DS_HOUR_COLOR)), percentSinceCurrentHourPixel);
+                color = addColors(color, scaleColor(perceived(DataStore.get(DS_HOUR_COLOR)), percentSinceCurrentHourPixel));
             }
 
             pixels.setPixelColor(i, color);
@@ -189,6 +189,15 @@ void ClockDisplayClass::continuousAnimation(time_t t) {
 
         lastAbsoluteMillis = currentAbsoluteMillis;
     }
+}
+
+uint32_t ClockDisplayClass::addColors(uint32_t a, uint32_t b) {
+
+    uint8_t red = std::min(EXTRACT_RED(a) + EXTRACT_RED(b), (uint32_t)0xff);
+    uint8_t green = std::min(EXTRACT_GREEN(a) + EXTRACT_GREEN(b), (uint32_t)0xff);
+    uint8_t blue = std::min(EXTRACT_BLUE(a) + EXTRACT_BLUE(b), (uint32_t)0xff);
+
+    return pixels.Color(red, green, blue);
 }
 
 uint32_t ClockDisplayClass::scaleColor(uint32_t color, float scale) {
@@ -219,11 +228,13 @@ uint8_t ClockDisplayClass::gamma(uint8_t x) {
 
 uint32_t ClockDisplayClass::perceived(uint32_t color) {
 
+    color = scaleColor(color, brightness);
+
     uint8_t red = gamma(EXTRACT_RED(color));
     uint8_t green = gamma(EXTRACT_GREEN(color));
     uint8_t blue = gamma(EXTRACT_BLUE(color));
 
-    return scaleColor(pixels.Color(red, green, blue), brightness);
+    return pixels.Color(red, green, blue);
 }
 
 ClockDisplayClass ClockDisplay(NEOPIXELS_NUM, NEOPIXELS_PIN, NEO_GRB + NEO_KHZ800);
