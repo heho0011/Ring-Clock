@@ -10,6 +10,7 @@ enum Animation {
 
     ANIM_DISCRETE,
     ANIM_CONTINUOUS,
+    ANIM_BAR,
 
     NUM_ANIMATIONS
 };
@@ -60,7 +61,9 @@ private:
 
     void discreteAnimation(time_t t);
     void continuousAnimation(time_t t);
+    void barAnimation(time_t t);
 
+    void printTime(time_t t);
     uint32_t addColors(uint32_t a, uint32_t b);
     uint32_t scaleColor(uint32_t color, float scale);
     uint8_t gamma(uint8_t x);

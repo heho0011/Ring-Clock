@@ -59,6 +59,8 @@ void ClockDisplayClass::update() {
 
 void ClockDisplayClass::displayTime(time_t t) {
 
+    printTime(t);
+
     int selectedAnimation = DataStore.get(DS_CLOCK_ANIMATION);
 
     switch(selectedAnimation) {
@@ -70,12 +72,16 @@ void ClockDisplayClass::displayTime(time_t t) {
         case ANIM_CONTINUOUS:
             continuousAnimation(t);
             break;
+
+        case ANIM_BAR:
+            barAnimation(t);
+            break;
     }
 }
 
 void ClockDisplayClass::discreteAnimation(time_t t) {
 
-    static int lastSecond = 0;
+    static int lastSecond = -1;
 
     int currentSecond = second(t);
     int currentMinute = minute(t);
@@ -84,10 +90,6 @@ void ClockDisplayClass::discreteAnimation(time_t t) {
     // Only update the strip when the time changes
     if (lastSecond != currentSecond) {
 
-        Serial.println(String(currentHour) + ":" +
-                       String(currentMinute) + ":" +
-                       String(currentSecond));
-
         int hourPixel = (currentHour % 12) * 5 + currentMinute / 12;
         
         for (int i = 0; i < NEOPIXELS_NUM; i++) {
@@ -95,15 +97,15 @@ void ClockDisplayClass::discreteAnimation(time_t t) {
             uint32_t color = 0x000000;
 
             if (i == currentSecond) {
-                color |= DataStore.get(DS_SECOND_COLOR);
+                color = addColors(color, DataStore.get(DS_SECOND_COLOR));
             }
 
             if (i == currentMinute) {
-                color |= DataStore.get(DS_MINUTE_COLOR);
+                color = addColors(color, DataStore.get(DS_MINUTE_COLOR));
             }
 
             if (i == hourPixel) {
-                color |= DataStore.get(DS_HOUR_COLOR);
+                color = addColors(color, DataStore.get(DS_HOUR_COLOR));
             }
 
             pixels.setPixelColor(i, perceived(color));
@@ -117,7 +119,7 @@ void ClockDisplayClass::discreteAnimation(time_t t) {
 
 void ClockDisplayClass::continuousAnimation(time_t t) {
 
-    static int lastSecond = 0;
+    static int lastSecond = -1;
     static unsigned long lastAbsoluteMillis = 0;
     static int millisAtSecondStart = 0;
 
@@ -128,10 +130,6 @@ void ClockDisplayClass::continuousAnimation(time_t t) {
     int currentHour = hour(t);
 
     if (lastSecond != currentSecond) {
-
-        Serial.println(String(currentHour) + ":" +
-                       String(currentMinute) + ":" +
-                       String(currentSecond));
 
         lastSecond = currentSecond;
         millisAtSecondStart = currentAbsoluteMillis % 1000;
@@ -188,6 +186,58 @@ void ClockDisplayClass::continuousAnimation(time_t t) {
         pixels.show();
 
         lastAbsoluteMillis = currentAbsoluteMillis;
+    }
+}
+
+void ClockDisplayClass::barAnimation(time_t t) {
+
+    static int lastMinute = -1;
+
+    int currentSecond = second(t);
+    int currentMinute = minute(t);
+    int currentHour = hour(t);
+
+    // Only update the strip when the time changes
+    if (lastMinute != currentMinute) {
+
+        int hourPixel = (currentHour % 12) * 5 + currentMinute / 12;
+        
+        for (int i = 0; i < NEOPIXELS_NUM; i++) {
+
+            uint32_t color = 0x000000;
+
+            if (i <= currentMinute) {
+                color = addColors(color, DataStore.get(DS_MINUTE_COLOR));
+            }
+
+            if (i == hourPixel) {
+                color = addColors(color, DataStore.get(DS_HOUR_COLOR));
+            }
+
+            pixels.setPixelColor(i, perceived(color));
+        }
+
+        pixels.show();
+
+        lastMinute = currentMinute;
+    }
+}
+
+void ClockDisplayClass::printTime(time_t t) {
+
+    static int lastSecond = -1;
+
+    int currentSecond = second(t);
+    int currentMinute = minute(t);
+    int currentHour = hour(t);
+
+    if (lastSecond != currentSecond) {
+
+        Serial.println(String(currentHour) + ":" +
+                       String(currentMinute) + ":" +
+                       String(currentSecond));
+        
+        lastSecond = currentSecond;
     }
 }
 
