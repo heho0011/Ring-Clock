@@ -38,7 +38,7 @@
       </div>
 
       <div class="form-group">
-        <label for="brightness" class="col-sm-2 control-label">Brightness:</label>
+        <label for="brightness-slider" class="col-sm-2 control-label">Brightness:</label>
         <div class="col-sm-5 col-md-4 col-lg-3">
           <input name="brightness" id="brightness-slider" class="form-control"
               type="range" min="0" max="100" value="100" />
@@ -77,6 +77,34 @@
             <option value="1">Continuous</option>
             <option value="2">Bar</option>
           </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="night-mode-enable" class="col-sm-2 control-label">Night mode:</label>
+        <div class="col-sm-5 col-md-4 col-lg-3">
+          <select name="night_mode_enable" id="night-mode-enable" class="form-control">
+            <option value="0">Disabled</option>
+            <option value="1">Enabled</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="night-mode-brightness-slider" class="col-sm-2 control-label">Night mode brightness:</label>
+        <div class="col-sm-5 col-md-4 col-lg-3">
+          <input name="night_mode_brightness" id="night-mode-brightness-slider" class="form-control"
+              type="range" min="0" max="100" value="100" />
+        </div>
+        <div class="col-sm-1 text-center">
+          <output id="night-mode-brightness-value">100%</output>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="gamma" class="col-sm-2 control-label">Gamma:</label>
+        <div class="col-sm-5 col-md-4 col-lg-3">
+          <input name="gamma" id="gamma" class="form-control" type="number" value="2.2" step="0.1" min="0.1" />
         </div>
       </div>
 

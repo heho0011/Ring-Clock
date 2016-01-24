@@ -32,6 +32,9 @@ void DataStoreClass::resetSettings() {
     store[DS_HOUR_COLOR] = BLUE;
     store[DS_MINUTE_COLOR] = GREEN;
     store[DS_SECOND_COLOR] = RED;
+    store[DS_NIGHT_MODE_BRIGHTNESS] = 25;
+    float f = 2.2;
+    store[DS_GAMMA] = *reinterpret_cast<int*>(&f);
 
     // Set the EEPROM to the default store values
     EEPROM.put(0, store);

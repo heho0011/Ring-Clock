@@ -21,6 +21,7 @@
 
 void setup() {
 
+    delay(5000);
     Serial.begin(115200);
     Serial.print("\n\n");
 

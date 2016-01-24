@@ -64,6 +64,8 @@ private:
     void barAnimation(time_t t);
 
     void printTime(time_t t);
+    void updateNightMode(time_t t);
+
     uint32_t addColors(uint32_t a, uint32_t b);
     uint32_t scaleColor(uint32_t color, float scale);
     uint8_t gamma(uint8_t x);

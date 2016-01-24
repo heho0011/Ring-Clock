@@ -114,7 +114,7 @@ uint64_t InternetTimeClass::getNtpTimestamp() {
 time_t InternetTimeClass::getTime() {
 
     // Get the timezone first to avoid interfering with NTP calculations
-    time_t timezoneOffset = Geolocation.getTimezoneOffset();
+    time_t timezoneOffset = Geolocation.getTimezoneOffset(true);
 
     // Perform a DNS lookup on the hostname
     IPAddress ip;

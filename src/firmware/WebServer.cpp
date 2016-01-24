@@ -11,7 +11,6 @@ void WebServerClass::begin(const char* domain) {
 
     SPIFFS.begin();
 
-    server.serveStatic("/dummy.txt", SPIFFS, "/dummy.txt");
     server.serveStatic("/settings/", SPIFFS, "/settings/index.html", "max-age=86400");
     server.serveStatic("/settings/settings.js", SPIFFS, "/settings/settings.js", "max-age=86400");
 
@@ -61,17 +60,26 @@ bool WebServerClass::parse(String key, String value) {
         newKey = DS_SECOND_COLOR;
     } else if (key.equals("animation")) {
         newKey = DS_CLOCK_ANIMATION;
+    } else if (key.equals("night_mode_enable")) {
+        newKey = DS_NIGHT_MODE_ENABLE;
+    } else if (key.equals("night_mode_brightness")) {
+        newKey = DS_NIGHT_MODE_BRIGHTNESS;
+    } else if (key.equals("gamma")) {
+        newKey = DS_GAMMA;
     } else {
         return false;
     }
 
     int newVal;
+    float f;
 
     switch(newKey) {
 
         case DS_TIMEZONE:
         case DS_BRIGHTNESS:
         case DS_CLOCK_ANIMATION:
+        case DS_NIGHT_MODE_ENABLE:
+        case DS_NIGHT_MODE_BRIGHTNESS:
             newVal = value.toInt();
             break;
 
@@ -80,6 +88,12 @@ bool WebServerClass::parse(String key, String value) {
         case DS_SECOND_COLOR:
             // Convert the hex string to an int. Offset to remove the preceding # symbol.
             newVal = (int)strtol(&value[1], NULL, 16);
+            break;
+
+        case DS_GAMMA:
+            // Force the 32-bit float into an int type for storage
+            f = value.toFloat();
+            newVal = *reinterpret_cast<int*>(&f);
             break;
 
         default:
@@ -121,6 +135,15 @@ void WebServerClass::handleSettingsGet() {
     json.concat(",\"minute_color\":" + getColorCode(DataStore.get(DS_MINUTE_COLOR)));
     json.concat(",\"second_color\":" + getColorCode(DataStore.get(DS_SECOND_COLOR)));
     json.concat(",\"animation\":" + String(DataStore.get(DS_CLOCK_ANIMATION)));
+
+    json.concat(",\"night_mode\":{");
+        json.concat("\"enabled\":" + String(DataStore.get(DS_NIGHT_MODE_ENABLE)));
+        json.concat(",\"brightness\":" + String(DataStore.get(DS_NIGHT_MODE_BRIGHTNESS)));
+    json.concat("}");
+
+    int i = DataStore.get(DS_GAMMA);
+    float gamma = *reinterpret_cast<float*>(&i);
+    json.concat(",\"gamma\":" + String(gamma));
 
     json.concat("}");
     

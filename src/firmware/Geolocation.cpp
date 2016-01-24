@@ -9,6 +9,7 @@
 #define MAX_CONNECTION_ATTEMPTS     3
 #define LOCATION_SERVICE_HOST       "ipinfo.io"
 #define TIMEZONE_SERVICE_HOST       "api.timezonedb.com"
+#define SUNRISE_SUNSET_SERVICE_HOST "api.sunrise-sunset.org"
 
 extern const String timezones[];
 
@@ -24,10 +25,10 @@ void GeolocationClass::begin() {
     updatePosition();
 }
 
-int GeolocationClass::getTimezoneOffset() {
+int GeolocationClass::getTimezoneOffset(bool force) {
 
     // Update timezone every request so that DST is handled
-    if (!updateTimezone()) {
+    if (force && !updateTimezone()) {
 
         timezoneOffset = DataStore.get(DS_LAST_TIMEZONE_OFFSET);
 
@@ -40,20 +41,26 @@ int GeolocationClass::getTimezoneOffset() {
 
 float GeolocationClass::getLatitude() {
 
-    if (!hasBeenLocated) {
-        updatePosition();
-    }
-
+    updatePosition();
     return latitude;
 }
 
 float GeolocationClass::getLongitude() {
 
-    if (!hasBeenLocated) {
-        updatePosition();
-    }
-
+    updatePosition();
     return longitude;
+}
+
+time_t GeolocationClass::getSunriseTime() {
+
+    updateSunriseSunset();
+    return sunriseTime;
+}
+
+time_t GeolocationClass::getSunsetTime() {
+
+    updateSunriseSunset();
+    return sunsetTime;
 }
 
 String GeolocationClass::getDetectedTimezone() {
@@ -65,7 +72,29 @@ String GeolocationClass::getDetectedTimezone() {
     return detectedTimezone;
 }
 
+time_t GeolocationClass::extractTime(String utc) {
+
+    TimeElements tm;
+
+    // Example input string: 2016-01-23T23:15:54+00:00
+    // Ugly substring hacking because sscanf is not implemented on ESP8266
+    tm.Year = CalendarYrToTm(utc.substring(0, 4).toInt());
+    tm.Month = utc.substring(5, 7).toInt();
+    tm.Day = utc.substring(8, 10).toInt();
+    tm.Hour = utc.substring(11, 13).toInt();
+    tm.Minute = utc.substring(14, 16).toInt();
+    tm.Second = utc.substring(17, 19).toInt();
+
+    return makeTime(tm) + getTimezoneOffset();
+}
+
 bool GeolocationClass::updatePosition() {
+
+    // Only update if necessary
+    static bool hasBeenLocated = false;
+    if (hasBeenLocated) {
+        return true;
+    }
 
     if (!httpGet(LOCATION_SERVICE_HOST, "/loc")) {
         return false;
@@ -92,6 +121,51 @@ bool GeolocationClass::updatePosition() {
     return true;
 }
 
+bool GeolocationClass::updateSunriseSunset() {
+
+    // Only update if necessary
+    static time_t lastChecked = 0;
+    if (now() - lastChecked < SECS_PER_DAY) {
+        return true;
+    }
+
+    String url = "/json?formatted=0";
+    time_t t = now();
+    url += "&date=" + String(year(t)) + "-" + String(month(t)) + "-" + String(day(t));
+    url += "&lat=" + String(getLatitude());
+    url += "&lng=" + String(getLongitude());
+    if (!httpGet(SUNRISE_SUNSET_SERVICE_HOST, url)) {
+        return false;
+    }
+
+    // Wait for response to arrive
+    while (!wifi.available()) { }
+
+    // Parse the response
+    if (!wifi.find("\"sunrise\":\"")) {
+        Serial.println("Could not parse sunrise");
+        return false;
+    } else {
+        sunriseTime = extractTime(wifi.readStringUntil('\"'));
+    }
+
+    if (!wifi.find("\"sunset\":\"")) {
+        Serial.println("Could not parse sunset");
+        return false;
+    } else {
+        sunsetTime = extractTime(wifi.readStringUntil('\"'));
+    }
+
+    Serial.print("Detected sunrise: ");
+    Serial.println(sunriseTime);
+    Serial.print("Detected sunset: ");
+    Serial.println(sunsetTime);
+
+    lastChecked = now();
+
+    return true;
+}
+
 bool GeolocationClass::updateTimezone() {
 
     String url = "/?format=json";
@@ -101,10 +175,8 @@ bool GeolocationClass::updateTimezone() {
 
     if (autoDetectTimezone) {
 
-        if (!hasBeenLocated) {
-            if (!updatePosition()) {
-                return false;
-            }
+        if (!updatePosition()) {
+            return false;
         }
 
         url += "&lat=" + String(getLatitude());
