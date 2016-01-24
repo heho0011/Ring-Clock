@@ -124,8 +124,9 @@ bool GeolocationClass::updatePosition() {
 bool GeolocationClass::updateSunriseSunset() {
 
     // Only update if necessary
-    static time_t lastChecked = 0;
-    if (now() - lastChecked < SECS_PER_DAY) {
+    static time_t lastDay = 0;
+    int currentDay = day(now());
+    if (lastDay == currentDay) {
         return true;
     }
 
@@ -161,7 +162,7 @@ bool GeolocationClass::updateSunriseSunset() {
     Serial.print("Detected sunset: ");
     Serial.println(sunsetTime);
 
-    lastChecked = now();
+    lastDay = currentDay;
 
     return true;
 }
