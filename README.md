@@ -1,5 +1,5 @@
-Ring Clock forked from ajcord/The-Clock-Awakens
-===============================================
+Ring Clock
+==========
 
 Using LEDs and an ESP8266 to make a smart digital analog clock.
 
