@@ -1,9 +1,11 @@
-Ring Clock   forked from ajcord/The-Clock-Awakens
-=================================================
+Ring Clock forked from ajcord/The-Clock-Awakens
+===============================================
 
-Using LEDs and an ESP8266 to make a smart digital analog clock
+Using LEDs and an ESP8266 to make a smart digital analog clock.
 
 Uses the [Sunrise-Sunset API](http://sunrise-sunset.org/api) among others.
+
+Only modified the code so that it works with the latest Arduino IDE 1.6.11 and up-to-date libraries.
 
 Setting up the environment
 --------------------------
