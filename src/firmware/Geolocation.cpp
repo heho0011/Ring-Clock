@@ -3,7 +3,10 @@
 #include "InternetTime.h"
 #include "DataStore.h"
 #include "timezones.h"
-#include <Time.h>
+#include <TimeLib.h>
+#include <ESP8266WiFi.h>
+
+WiFiClient wifi;
 
 #define TIMEOUT                     2000 // ms
 #define MAX_CONNECTION_ATTEMPTS     3
