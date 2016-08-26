@@ -1,6 +1,7 @@
 #pragma once
 
-#include <ESP8266WiFi.h>
+#include <TimeLib.h>
+#include <WString.h>
 
 /**
  * A class to get the current position and time zone.
@@ -66,7 +67,7 @@ private:
     bool updateTimezone();
     bool httpGet(const String hostname, const String url);
 
-    WiFiClient wifi;
+    //WiFiClient wifi;
 
     int timezoneOffset;
     float latitude, longitude;
